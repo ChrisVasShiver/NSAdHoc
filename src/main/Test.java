@@ -12,7 +12,7 @@ public class Test {
 	
 	
 	public static void main(String[] args) throws IOException {
-		byte[] destination = InetAddress.getByName("192.168.5.1").getAddress();
+		byte[] destination = InetAddress.getByName("Thierry").getAddress();
 		InetAddress group = InetAddress.getByName("228.0.0.2");
 		MulticastSocket s = new MulticastSocket(6789);
 		s.joinGroup(group);
