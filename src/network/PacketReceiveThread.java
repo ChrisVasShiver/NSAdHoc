@@ -10,13 +10,12 @@ public class PacketReceiveThread implements Runnable {
 
 	private MulticastSocket socket;
 	private InetAddress group;
-	
+	public volatile boolean wait = true;
 	public PacketReceiveThread(MulticastSocket s, InetAddress g) {
 		socket = s;
 		group = g;
 	}
 	public void run() {
-		boolean wait = true;
 		
 		
 		while(wait) {
