@@ -12,7 +12,7 @@ public class Test {
 	
 	
 	public static void main(String[] args) throws IOException {
-		String name = InetAddress.getLocalHost().getHostAddress();
+		byte[] destination = InetAddress.getByName("192.168.5.1").getAddress();
 		InetAddress group = InetAddress.getByName("228.0.0.2");
 		MulticastSocket s = new MulticastSocket(6789);
 		s.joinGroup(group);
@@ -25,10 +25,13 @@ public class Test {
 		
 		String line;
 		do {
-			line = name + "> " + scanner.nextLine();
-			DatagramPacket hi = new DatagramPacket(line.getBytes(), line.length(),
+			line = scanner.nextLine();
+			byte[] rawPacket = new byte[destination.length + line.length()];
+			System.arraycopy(destination, 0, rawPacket, 0, destination.length); 
+			System.arraycopy(line.getBytes(), 0, rawPacket, destination.length, line.length());
+			DatagramPacket packet = new DatagramPacket(rawPacket, rawPacket.length,
 					group, 6789);
-			s.send(hi);
+			s.send(packet);
 		} while(!line.equals("quit"));
 		
 		scanner.close();
