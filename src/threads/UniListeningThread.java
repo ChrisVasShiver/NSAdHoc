@@ -1,38 +1,61 @@
 package threads;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import helper.Packet;
+import main.Client;
 
 public class UniListeningThread implements Runnable {
 
 	public volatile boolean wait = true;
+	private Client client;
 	
-	public UniListeningThread() {
-		// TODO Auto-generated constructor stub
+	public UniListeningThread(Client client) {
+		this.client = client;
 	}
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		while(wait) {
+			byte[] buffer = new byte[1024];
+			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
+			try {
+				client.uniSocket.receive(recvPacket);
+			} catch (IOException e) {e.printStackTrace();}
+			Packet pkt = null;
+			try {
+				pkt = new Packet(buffer);
+			} catch (UnknownHostException | ArrayIndexOutOfBoundsException e) { continue; }
+			handlePacket(pkt);
+			
+		}
 
 	}
 	
-	public void handlePacket(byte[] raw) throws UnknownHostException {
-		Packet packet = new Packet(raw);
-		if(packet.getDest() == InetAddress.getLocalHost()) {
+	public void handlePacket(Packet packet) {
+		if(packet.getAckNr() != 0) {
+			// TODO ackpacket
+			return;
+		}
+		if(packet.getDest().equals(client.getLocalAddress())) {
 			//TODO what if the packet is for me
-			Packet ackpkt = new Packet(InetAddress.getLocalHost(), packet.getDest(), 0,0,0, null);
-			//TODO add destination address
-			DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length);
+			Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(), 0, packet.getSeqNr() + 1, 0, null);
+			DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length, 
+					client.routingTable.get(ackpkt.getDest()).nextHop, client.uniPort);
+			try {
+				client.uniSocket.send(pkt);
+			} catch (IOException e) { e.printStackTrace(); }
+			System.out.println(packet.getData());
 		} else {
 			if(!packet.isExpired()) {
 				packet.decreaseTTL();
-				//TODO what if the packet is not expired.
-				//TODO add destination address
-				DatagramPacket pkt = new DatagramPacket(packet.getBytes(), packet.getBytes().length);
+				DatagramPacket pkt = new DatagramPacket(packet.getBytes(), packet.getBytes().length,
+						client.routingTable.get(packet.getDest()).nextHop, client.uniPort);
+				try {
+					client.uniSocket.send(pkt);
+				} catch (IOException e) { e.printStackTrace(); }
 			}
 		}
 	}

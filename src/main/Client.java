@@ -77,7 +77,7 @@ public class Client {
 	private void startThreads() {
 		dvRunnable = new DistanceVectorThread(this);
 		mlRunnable = new MultiListeningThread(this);
-		ulRunnable = new UniListeningThread();
+		ulRunnable = new UniListeningThread(this);
 		dvThread = new Thread(dvRunnable);
 		mlThread = new Thread(mlRunnable);
 		ulThread = new Thread(ulRunnable);
