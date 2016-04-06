@@ -24,7 +24,6 @@ public class UniListeningThread implements Runnable {
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
 				client.uniSocket.receive(recvPacket);
-				System.out.println(Arrays.toString(buffer));
 			} catch (IOException e) {e.printStackTrace();}
 			Packet pkt = null;
 			try {
