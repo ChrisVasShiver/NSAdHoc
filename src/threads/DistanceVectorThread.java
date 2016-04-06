@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 
-import network.DistanceVectorEntry;
+import helper.DistanceVectorEntry;
 import main.Client;
 
 public class DistanceVectorThread implements Runnable {

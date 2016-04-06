@@ -9,8 +9,8 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
+import helper.DistanceVectorEntry;
 import helper.Packet;
-import network.DistanceVectorEntry;
 import threads.DistanceVectorThread;
 import threads.MultiListeningThread;
 import threads.UniListeningThread;

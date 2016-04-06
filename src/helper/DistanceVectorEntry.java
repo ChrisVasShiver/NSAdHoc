@@ -1,9 +1,7 @@
-package network;
+package helper;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
-import helper.Helper;
 
 public class DistanceVectorEntry {
 	public static final int SIZE = 12;

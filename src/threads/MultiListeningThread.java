@@ -6,8 +6,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
+import helper.DistanceVectorEntry;
 import main.Client;
-import network.DistanceVectorEntry;
 
 public class MultiListeningThread implements Runnable {
 

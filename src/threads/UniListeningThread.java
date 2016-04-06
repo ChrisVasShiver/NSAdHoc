@@ -3,7 +3,6 @@ package threads;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 
 import helper.Packet;
 import main.Client;
