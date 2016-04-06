@@ -25,7 +25,7 @@ public class MultiListeningThread implements Runnable {
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
 				client.multiSocket.receive(recvPacket);
-		//		printRoutingTable();
+				printRoutingTable();
 			} catch (IOException e) {e.printStackTrace();}
 			checkTimeoutElapsed();
 			InetAddress sender = null;

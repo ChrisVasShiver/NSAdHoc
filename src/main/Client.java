@@ -82,7 +82,10 @@ public class Client {
 			}
 			Packet pack = new Packet(getLocalAddress(), dest, 0, 0, 0, line);
 			DistanceVectorEntry dve = routingTable.get(dest);
-			if(dve == null) continue;
+			if(dve == null) {
+				System.out.println("Address " + dest.getHostName() + " is not in your routing table.");
+				continue;
+			}
 			DatagramPacket dpack = new DatagramPacket(pack.getBytes(), pack.getBytes().length, dve.nextHop, uniPort);
 			try {
 				uniSocket.send(dpack);
