@@ -32,6 +32,8 @@ public class MultiListeningThread implements Runnable {
 			try {
 				sender = InetAddress.getByName(recvPacket.getSocketAddress().toString().split(":")[0].replace("/", ""));
 			} catch (UnknownHostException e) {e.printStackTrace(); }
+			if(sender == client.getLocalAddress())
+				continue;
 			client.neighbourTimeout.put(sender, System.currentTimeMillis());
 			handleDistanceVectorPacket(buffer, sender);
 		}
@@ -58,6 +60,7 @@ public class MultiListeningThread implements Runnable {
 				DistanceVectorEntry storedEntry = client.routingTable.get(address);
 				if(storedEntry == null || storedEntry.hops > entry.hops + 1) {
 					entry.hops += 1;
+					entry.nextHop = sender;
 					client.routingTable.put(address, entry);
 				}
 			}
@@ -73,6 +76,7 @@ public class MultiListeningThread implements Runnable {
 					client.routingTable.remove(address);
 				else {
 					entry.hops += 1;
+					entry.nextHop = sender;
 					client.routingTable.put(address, entry);
 				}
 			}
@@ -88,7 +92,7 @@ public class MultiListeningThread implements Runnable {
 	private void checkTimeoutElapsed() {
 		for(InetAddress address : client.neighbourTimeout.keySet()) {
 			long now = System.currentTimeMillis();
-			if(client.neighbourTimeout.get(address) - now > 3 * client.sendTimeout) {
+			if(now - client.neighbourTimeout.get(address) > 3 * client.sendTimeout) {
 				removeEntries(address);
 			}
 		}
@@ -98,6 +102,7 @@ public class MultiListeningThread implements Runnable {
 		for(InetAddress address : client.routingTable.keySet())
 			if(client.routingTable.get(address).nextHop == node) 
 				client.routingTable.remove(address);
+		client.routingTable.remove(node);
 	}
 	
 	/* TODO:
