@@ -15,6 +15,7 @@ import threads.UniListeningThread;
 
 public class Client {
 	public ConcurrentHashMap<InetAddress, DistanceVectorEntry> routingTable = new ConcurrentHashMap<InetAddress, DistanceVectorEntry>();
+	public ConcurrentHashMap<InetAddress, Long> neighbourTimeout = new ConcurrentHashMap<InetAddress, Long>();
 	private Scanner in = new Scanner(System.in);
 	
 	private Thread dvThread;
@@ -29,8 +30,12 @@ public class Client {
 	public final int multiPort = 6789;
 	public DatagramSocket uniSocket;
 	public final int uniPort = 7000;
+	public final int sendTimeout = 3000;
 	
 	public Client() {
+		InetAddress localAddress = getLocalAddress();
+		DistanceVectorEntry defaultEntry = new DistanceVectorEntry(localAddress, 0, localAddress);
+		routingTable.put(localAddress, defaultEntry);
 		try {
 			group = InetAddress.getByName("228.0.0.2");
 			multiSocket = new MulticastSocket(multiPort);
@@ -46,6 +51,8 @@ public class Client {
 		startThreads();
 		handleUserInput();
 		stopThreads();
+		multiSocket.close();
+		uniSocket.close();
 	}
 	
 	public InetAddress getLocalAddress() {

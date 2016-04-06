@@ -25,12 +25,14 @@ public class MultiListeningThread implements Runnable {
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
 				client.multiSocket.receive(recvPacket);
+				printRoutingTable();
 			} catch (IOException e) {e.printStackTrace();}
+			checkTimeoutElapsed();
 			InetAddress sender = null;
 			try {
-				sender = InetAddress.getByName(recvPacket.getSocketAddress().toString());
+				sender = InetAddress.getByName(recvPacket.getSocketAddress().toString().split(":")[0].replace("/", ""));
 			} catch (UnknownHostException e) {e.printStackTrace(); }
-			
+			client.neighbourTimeout.put(sender, System.currentTimeMillis());
 			handleDistanceVectorPacket(buffer, sender);
 		}
 	}
@@ -42,14 +44,14 @@ public class MultiListeningThread implements Runnable {
 			System.arraycopy(packet, i, raw, 0, DistanceVectorEntry.SIZE);
 			DistanceVectorEntry dve = null;
 			try { dve = new DistanceVectorEntry(raw);
-			} catch (UnknownHostException e) {e.printStackTrace(); continue;}
+			} catch (UnknownHostException e) { continue; }
 			recvDistanceVector.put(dve.destination, dve);
 		}
-		updateRoutingTable(recvDistanceVector);
-		removeEntries(recvDistanceVector, sender);
+		updateRoutingTable(recvDistanceVector, sender);
+		updateEntries(recvDistanceVector, sender);
 	}
 
-	public void updateRoutingTable(HashMap<InetAddress, DistanceVectorEntry> distanceVector) {
+	private void updateRoutingTable(HashMap<InetAddress, DistanceVectorEntry> distanceVector, InetAddress sender) {
 		for(InetAddress address : distanceVector.keySet()) {
 			DistanceVectorEntry entry = distanceVector.get(address);
 			if(!entry.nextHop.equals(client.getLocalAddress())) {
@@ -62,19 +64,43 @@ public class MultiListeningThread implements Runnable {
 		}
 	}
 	
-	public void removeEntries(HashMap<InetAddress, DistanceVectorEntry> distanceVector, InetAddress sender) {
+	private void updateEntries(HashMap<InetAddress, DistanceVectorEntry> distanceVector, InetAddress sender) {
 		for(InetAddress address : client.routingTable.keySet()) {
 			DistanceVectorEntry storedEntry = client.routingTable.get(address);
 			if(storedEntry.nextHop == sender) {
 				DistanceVectorEntry entry = distanceVector.get(address);
 				if(entry == null)
 					client.routingTable.remove(address);
+				else {
+					entry.hops += 1;
+					client.routingTable.put(address, entry);
+				}
 			}
 		}
 	}
 	
+	private synchronized void printRoutingTable() {
+		System.out.println("Routing Table: ");
+		for(InetAddress address : client.routingTable.keySet()) 
+			System.out.println(client.routingTable.get(address).toString());
+	}
+	
+	private void checkTimeoutElapsed() {
+		for(InetAddress address : client.neighbourTimeout.keySet()) {
+			long now = System.currentTimeMillis();
+			if(client.neighbourTimeout.get(address) - now > 3 * client.sendTimeout) {
+				removeEntries(address);
+			}
+		}
+	}
+	
+	private void removeEntries(InetAddress node) {
+		for(InetAddress address : client.routingTable.keySet())
+			if(client.routingTable.get(address).nextHop == node) 
+				client.routingTable.remove(address);
+	}
+	
 	/* TODO:
 	 * postpone good news after bad news
-	 * remove neighbours if link is broken? After timeout no broadcast received?
 	 */
 }

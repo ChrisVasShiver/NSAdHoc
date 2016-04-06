@@ -23,6 +23,11 @@ public class DistanceVectorEntry {
 		byte[] cost = new byte[4];
 		byte[] hop = new byte[4];
 		System.arraycopy(raw, 0, source, 0, 4);
+		for(byte b : source) {
+			if(b != 0)
+				break;
+			throw new UnknownHostException("Host /0.0.0.0 is invalid");
+		}
 		System.arraycopy(raw, 4, cost, 0, 4);
 		System.arraycopy(raw, 8, hop, 0, 4);
 		this.destination = InetAddress.getByAddress(source);
@@ -36,5 +41,10 @@ public class DistanceVectorEntry {
 		System.arraycopy(Helper.integerToByteArray(hops),  0, result, 4, 4);
 		System.arraycopy(nextHop.getAddress(),  0, result, 8, 4);
 		return result;
+	}
+	
+	@Override
+	public String toString() {
+		return "[" + destination.toString() + ", " + hops + ", " + nextHop.toString() + "]";
 	}
 }
