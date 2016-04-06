@@ -31,8 +31,8 @@ public class Packet {
 	public Packet(byte[] raw) throws UnknownHostException {
 		byte[] src = new byte[4];
 		byte[] dest = new byte[4];
-		byte[] ackNr = new byte[4];
 		byte[] seqNr = new byte[4];
+		byte[] ackNr = new byte[4];
 		this.flag = raw[16];
 		byte[] timeStamp = new byte[4];
 		this.TTL = (int)(raw[21]);
@@ -42,10 +42,10 @@ public class Packet {
 		this.src = InetAddress.getByAddress(src);
 		System.arraycopy(raw, 0, dest, 4, 4);
 		this.dest = InetAddress.getByAddress(dest);
-		System.arraycopy(raw, 0, ackNr, 8, 4);
-		this.ackNr = Helper.byteArrayToInteger(ackNr);
-		System.arraycopy(raw, 0, seqNr, 12, 4);
-		this.seqNr = Helper.byteArrayToInteger(seqNr);
+		System.arraycopy(raw, 0, seqNr, 8, 4);
+		this.ackNr = Helper.byteArrayToInteger(seqNr);
+		System.arraycopy(raw, 0, ackNr, 12, 4);
+		this.seqNr = Helper.byteArrayToInteger(ackNr);
 		System.arraycopy(raw, 0, timeStamp, 17, 4);
 		this.timeStamp = Helper.byteArrayToInteger(timeStamp);
 		System.arraycopy(raw, 0, dataL, 22, 4);
@@ -138,8 +138,8 @@ public class Packet {
 		byte[] result = new byte[BASICL + dataL];
 		System.arraycopy(src.getAddress(),  0, result, 0, 4);
 		System.arraycopy(dest.getHostAddress(), 0, result, 4, 4);
-		System.arraycopy(ackNr, 0, result, 8, 4);
-		System.arraycopy(seqNr, 0, result, 12, 4);
+		System.arraycopy(seqNr, 0, result, 8, 4);
+		System.arraycopy(ackNr, 0, result, 12, 4);
 		result[16] = flag;
 		System.arraycopy(timeStamp, 0, result, 17, 4);
 		System.arraycopy(TTL, 0, result, 21, 1);
