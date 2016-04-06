@@ -62,7 +62,7 @@ public class Client {
 		try {
 			result = InetAddress.getLocalHost();
 		} catch (UnknownHostException e) { e.printStackTrace();}
-		return result;
+		return (result.isLoopbackAddress() ? null : result);
 	}
 	public static void main(String[] args) {
 		Client client = new Client();

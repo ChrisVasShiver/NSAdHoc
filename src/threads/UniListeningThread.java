@@ -3,6 +3,7 @@ package threads;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 import helper.Packet;
 import main.Client;
@@ -19,6 +20,7 @@ public class UniListeningThread implements Runnable {
 	@Override
 	public void run() {
 		while(wait) {
+	
 			byte[] buffer = new byte[1024];
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
@@ -28,10 +30,11 @@ public class UniListeningThread implements Runnable {
 			try {
 				pkt = new Packet(buffer);
 			} catch (UnknownHostException | ArrayIndexOutOfBoundsException e) { e.printStackTrace();continue; }
-			handlePacket(pkt);
+			if(pkt != null) {
+				handlePacket(pkt);
+			}
 			
 		}
-
 	}
 	
 	public void handlePacket(Packet packet) {
@@ -41,7 +44,7 @@ public class UniListeningThread implements Runnable {
 		}
 		if(packet.getDest().equals(client.getLocalAddress())) {
 			//TODO what if the packet is for me
-			Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(), 0, packet.getSeqNr() + 1, 0, null);
+			Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(),0,  packet.getSeqNr() + 1, 0, null);
 			DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length, 
 					client.routingTable.get(ackpkt.getDest()).nextHop, client.uniPort);
 			try {

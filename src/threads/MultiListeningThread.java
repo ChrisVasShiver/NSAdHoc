@@ -58,7 +58,7 @@ public class MultiListeningThread implements Runnable {
 			DistanceVectorEntry entry = distanceVector.get(address);
 			if(!entry.nextHop.equals(client.getLocalAddress())) {
 				DistanceVectorEntry storedEntry = client.routingTable.get(address);
-				if(storedEntry == null || storedEntry.hops > entry.hops + 1) {
+				if(storedEntry == null || storedEntry.hops > entry.hops + 1 || storedEntry.nextHop == sender) {
 					entry.hops += 1;
 					entry.nextHop = sender;
 					client.routingTable.put(address, entry);
@@ -74,11 +74,6 @@ public class MultiListeningThread implements Runnable {
 				DistanceVectorEntry entry = distanceVector.get(address);
 				if(entry == null)
 					client.routingTable.remove(address);
-				else {
-					entry.hops += 1;
-					entry.nextHop = sender;
-					client.routingTable.put(address, entry);
-				}
 			}
 		}
 	}

@@ -45,9 +45,9 @@ public class Packet {
 		System.arraycopy(raw, 4, dest, 0, 4);
 		this.dest = InetAddress.getByAddress(dest);
 		System.arraycopy(raw, 8, seqNr, 0, 4);
-		this.ackNr = Helper.byteArrayToInteger(seqNr);
+		this.seqNr = Helper.byteArrayToInteger(seqNr);
 		System.arraycopy(raw, 12, ackNr, 0, 4);
-		this.seqNr = Helper.byteArrayToInteger(ackNr);
+		this.ackNr = Helper.byteArrayToInteger(ackNr);
 		System.arraycopy(raw, 17, timeStamp, 0, 4);
 		this.timeStamp = Helper.byteArrayToInteger(timeStamp);
 		System.arraycopy(raw, 22, dataL, 0, 4);
