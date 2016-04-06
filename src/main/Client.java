@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,8 +13,8 @@ import threads.DistanceVectorThread;
 import threads.MultiListeningThread;
 import threads.UniListeningThread;
 
-class Client {
-	private ConcurrentHashMap<InetAddress, DistanceVectorEntry> routingTable = new ConcurrentHashMap<InetAddress, DistanceVectorEntry>();
+public class Client {
+	public ConcurrentHashMap<InetAddress, DistanceVectorEntry> routingTable = new ConcurrentHashMap<InetAddress, DistanceVectorEntry>();
 	private Scanner in = new Scanner(System.in);
 	
 	private Thread dvThread;
@@ -23,11 +24,11 @@ class Client {
 	private MultiListeningThread mlRunnable;
 	private UniListeningThread ulRunnable;
 	
-	private MulticastSocket multiSocket;
-	private InetAddress group;
-	private int multiPort = 6789;
-	private DatagramSocket uniSocket;
-	private int uniPort = 7000;
+	public MulticastSocket multiSocket;
+	public InetAddress group;
+	public final int multiPort = 6789;
+	public DatagramSocket uniSocket;
+	public final int uniPort = 7000;
 	
 	public Client() {
 		try {
@@ -44,8 +45,16 @@ class Client {
 	public void start() {
 		startThreads();
 		handleUserInput();
+		stopThreads();
 	}
 	
+	public InetAddress getLocalAddress() {
+		InetAddress result = null;
+		try {
+			result = InetAddress.getLocalHost();
+		} catch (UnknownHostException e) { e.printStackTrace();}
+		return result;
+	}
 	public static void main(String[] args) {
 		Client client = new Client();
 		client.start();
@@ -59,8 +68,8 @@ class Client {
 	}
 	
 	private void startThreads() {
-		dvRunnable = new DistanceVectorThread();
-		mlRunnable = new MultiListeningThread();
+		dvRunnable = new DistanceVectorThread(this);
+		mlRunnable = new MultiListeningThread(this);
 		ulRunnable = new UniListeningThread();
 		dvThread = new Thread(dvRunnable);
 		mlThread = new Thread(mlRunnable);
@@ -71,6 +80,17 @@ class Client {
 	}
 	
 	private void stopThreads() {
+		dvRunnable.wait = false;
+		mlRunnable.wait = false;
+		ulRunnable.wait = false;
+		try {
+			dvThread.join();
+			mlThread.join();
+			ulThread.join();
+		} catch(InterruptedException e) {
+			//TODO
+			e.printStackTrace();
+		}
 		
 	}
 

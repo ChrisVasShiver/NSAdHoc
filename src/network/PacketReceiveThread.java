@@ -38,7 +38,7 @@ public class PacketReceiveThread implements Runnable {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					System.out.println(dve.getSource());
+					System.out.println(dve.destination);
 				}
 				InetAddress address = null;
 				try {
