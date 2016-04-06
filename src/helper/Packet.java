@@ -24,7 +24,10 @@ public class Packet {
 		this.ackNr = ackNr;
 		this.timeStamp = timeStamp;
 		this.TTL = BASICTTL;
-		this.dataL = data.getBytes().length;
+		this.dataL = 0;
+		try {
+		this.dataL = data.getBytes("UTF-16BE").length;
+		} catch (Exception e) {}
 		this.data = data;
 	}
 	
@@ -37,22 +40,22 @@ public class Packet {
 		byte[] timeStamp = new byte[4];
 		this.TTL = (int)(raw[21]);
 		byte[] dataL = new byte[4];
-		byte[] data = new byte[raw.length - BASICL];
 		System.arraycopy(raw,  0, src, 0, 4);
 		this.src = InetAddress.getByAddress(src);
-		System.arraycopy(raw, 0, dest, 4, 4);
+		System.arraycopy(raw, 4, dest, 0, 4);
 		this.dest = InetAddress.getByAddress(dest);
-		System.arraycopy(raw, 0, seqNr, 8, 4);
+		System.arraycopy(raw, 8, seqNr, 0, 4);
 		this.ackNr = Helper.byteArrayToInteger(seqNr);
-		System.arraycopy(raw, 0, ackNr, 12, 4);
+		System.arraycopy(raw, 12, ackNr, 0, 4);
 		this.seqNr = Helper.byteArrayToInteger(ackNr);
-		System.arraycopy(raw, 0, timeStamp, 17, 4);
+		System.arraycopy(raw, 17, timeStamp, 0, 4);
 		this.timeStamp = Helper.byteArrayToInteger(timeStamp);
-		System.arraycopy(raw, 0, dataL, 22, 4);
+		System.arraycopy(raw, 22, dataL, 0, 4);
 		this.dataL = Helper.byteArrayToInteger(dataL);
-		System.arraycopy(raw, 0, data, 26, BASICL + this.dataL);
+		byte[] data = new byte[this.dataL];
+		System.arraycopy(raw, 26, data, 0, this.dataL);
 		try {
-			this.data = new String(dataL, "UTF-16BE");
+			this.data = new String(data, "UTF-16BE");
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -144,12 +147,13 @@ public class Packet {
 		System.arraycopy(Helper.integerToByteArray(timeStamp), 0, result, 17, 4);
 		System.arraycopy(Helper.integerToByteArray(TTL), 0, result, 21, 1);
 		System.arraycopy(Helper.integerToByteArray(dataL), 0, result, 22, 4);
+		if(data != null) {
 		try {
-			System.arraycopy(data.getBytes("UTF-16BE"), 0, result, 26, BASICL + dataL);
+			System.arraycopy(data.getBytes("UTF-16BE"), 0, result, 26, dataL);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}}
 		return result;
 	}
 

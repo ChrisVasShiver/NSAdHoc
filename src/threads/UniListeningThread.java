@@ -3,6 +3,7 @@ package threads;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 import helper.Packet;
 import main.Client;
@@ -23,11 +24,12 @@ public class UniListeningThread implements Runnable {
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
 				client.uniSocket.receive(recvPacket);
+				System.out.println(Arrays.toString(buffer));
 			} catch (IOException e) {e.printStackTrace();}
 			Packet pkt = null;
 			try {
 				pkt = new Packet(buffer);
-			} catch (UnknownHostException | ArrayIndexOutOfBoundsException e) { continue; }
+			} catch (UnknownHostException | ArrayIndexOutOfBoundsException e) { e.printStackTrace();continue; }
 			handlePacket(pkt);
 			
 		}
