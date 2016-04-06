@@ -1,6 +1,7 @@
 package main;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -8,6 +9,7 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
+import helper.Packet;
 import network.DistanceVectorEntry;
 import threads.DistanceVectorThread;
 import threads.MultiListeningThread;
@@ -71,6 +73,24 @@ public class Client {
 		String line = "";
 		do {
 			line = in.nextLine();
+			InetAddress dest;
+			try {
+				dest = InetAddress.getByName("192.168.5." + line.toCharArray()[0]);
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+				continue;
+			}
+			Packet pack = new Packet(getLocalAddress(), dest, 0, 0, 0, line);
+			DistanceVectorEntry dve = routingTable.get(dest);
+			if(dve == null) continue;
+			DatagramPacket dpack = new DatagramPacket(pack.getBytes(), pack.getBytes().length, dve.nextHop, uniPort);
+			try {
+				uniSocket.send(dpack);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		} while(!line.equals("quit"));
 	}
 	
