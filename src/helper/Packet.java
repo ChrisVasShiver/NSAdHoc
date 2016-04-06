@@ -89,7 +89,7 @@ public class Packet {
 	public int getAckNr() {
 		return ackNr;
 	}
-
+	
 	public void setAckNr(int ackNr) {
 		this.ackNr = ackNr;
 	}
@@ -124,6 +124,14 @@ public class Packet {
 
 	public void setData(String data) {
 		this.data = data;
+	}
+	
+	public boolean isExpired() {
+		return TTL==0;
+	}
+	
+	public void decreaseTTL() {
+		TTL--;
 	}
 	
 	public byte[] getBytes() {
