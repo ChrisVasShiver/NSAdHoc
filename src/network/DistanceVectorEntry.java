@@ -5,19 +5,19 @@ import java.net.UnknownHostException;
 
 import helper.Helper;
 
-public class DistanceVector {
+public class DistanceVectorEntry {
 	public static final int SIZE = 12;
 	private InetAddress source;
 	private Integer cost;
 	private InetAddress hop;
 	
-	public DistanceVector(InetAddress source, Integer cost, InetAddress hop) {
+	public DistanceVectorEntry(InetAddress source, Integer cost, InetAddress hop) {
 		this.source = source;
 		this.cost = cost;
 		this.hop = hop;
 	}
 
-	public DistanceVector(byte[] raw) throws UnknownHostException {
+	public DistanceVectorEntry(byte[] raw) throws UnknownHostException {
 		assert raw.length == 12;
 		byte[] source = new byte[4];
 		byte[] cost = new byte[4];

@@ -11,6 +11,7 @@ public class PacketReceiveThread implements Runnable {
 	private MulticastSocket socket;
 	private InetAddress group;
 	public volatile boolean wait = true;
+	
 	public PacketReceiveThread(MulticastSocket s, InetAddress g) {
 		socket = s;
 		group = g;
@@ -19,13 +20,25 @@ public class PacketReceiveThread implements Runnable {
 		
 		
 		while(wait) {
-			byte[] buf = new byte[1000];
+			byte[] buf = new byte[12];
 			DatagramPacket recv = new DatagramPacket(buf, buf.length);
 				try {
 					socket.receive(recv);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				}
+				for(int i = 0; i < buf.length; i += DistanceVectorEntry.SIZE) {
+					byte[] entry = new byte[DistanceVectorEntry.SIZE];
+					System.arraycopy(buf, i, entry, 0, DistanceVectorEntry.SIZE);
+					DistanceVectorEntry dve = null;
+					try {
+						dve = new DistanceVectorEntry(entry);
+					} catch (UnknownHostException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					System.out.println(dve.getSource());
 				}
 				InetAddress address = null;
 				try {
@@ -49,10 +62,8 @@ public class PacketReceiveThread implements Runnable {
 	}
 
 	private void print(byte[] bs) {
-		for (int i = 4; i < bs.length; i++)
-			if(bs[i] != 0) {
-				System.out.print((char) bs[i]);
-			}
+		for(byte b : bs)
+				System.out.print(String.format("%02X", b));
 		System.out.println();
 	}
 

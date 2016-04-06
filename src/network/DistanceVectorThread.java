@@ -10,13 +10,15 @@ public class DistanceVectorThread implements Runnable {
 	public volatile boolean wait = true;
 	private MulticastSocket socket;
 	private InetAddress group;
-	private ConcurrentHashMap<InetAddress, DistanceVector> distanceVector = new ConcurrentHashMap<InetAddress, DistanceVector>();
+	private int port;
+	private ConcurrentHashMap<InetAddress, DistanceVectorEntry> distanceVector = new ConcurrentHashMap<InetAddress, DistanceVectorEntry>();
 
-	public DistanceVectorThread(ConcurrentHashMap<InetAddress, DistanceVector> distanceVector, InetAddress group,
-			MulticastSocket socket) {
+	public DistanceVectorThread(ConcurrentHashMap<InetAddress, DistanceVectorEntry> distanceVector, InetAddress group,
+			MulticastSocket socket, int port) {
 		this.distanceVector = distanceVector;
 		this.group = group;
 		this.socket = socket;
+		this.port = port;
 	}
 
 	@Override
@@ -38,23 +40,23 @@ public class DistanceVectorThread implements Runnable {
 	}
 
 	private DatagramPacket getDatagramPacket() {
-		byte[] rawPacket = new byte[distanceVector.size() * DistanceVector.SIZE];
+		byte[] rawPacket = new byte[distanceVector.size() * DistanceVectorEntry.SIZE];
 		int index = 0;
 		for (InetAddress address : distanceVector.keySet()) {
-			DistanceVector dv = distanceVector.get(address);
-			System.arraycopy(dv.getBytes(), 0, rawPacket, index, DistanceVector.SIZE);
-			index += DistanceVector.SIZE;
+			DistanceVectorEntry dv = distanceVector.get(address);
+			System.arraycopy(dv.getBytes(), 0, rawPacket, index, DistanceVectorEntry.SIZE);
+			index += DistanceVectorEntry.SIZE;
 		}
-		DatagramPacket packet = new DatagramPacket(rawPacket, rawPacket.length, group, socket.getPort());
+		DatagramPacket packet = new DatagramPacket(rawPacket, rawPacket.length, group, port);
 		return packet;
 
 	}
 
-	public ConcurrentHashMap<InetAddress, DistanceVector> getDistanceVector() {
+	public ConcurrentHashMap<InetAddress, DistanceVectorEntry> getDistanceVector() {
 		return distanceVector;
 	}
 
-	public void setDistanceVector(ConcurrentHashMap<InetAddress, DistanceVector> distanceVector) {
+	public void setDistanceVector(ConcurrentHashMap<InetAddress, DistanceVectorEntry> distanceVector) {
 		this.distanceVector = distanceVector;
 	}
 

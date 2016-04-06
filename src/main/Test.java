@@ -7,7 +7,7 @@ import java.net.MulticastSocket;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
-import network.DistanceVector;
+import network.DistanceVectorEntry;
 import network.DistanceVectorThread;
 import network.PacketReceiveThread;
 
@@ -17,15 +17,16 @@ public class Test {
 	public static void main(String[] args) throws IOException {
 		byte[] destination = InetAddress.getByName("192.168.5.1").getAddress();
 		InetAddress group = InetAddress.getByName("228.0.0.2");
-		MulticastSocket s = new MulticastSocket(6789);
+		int port = 6789;
+		MulticastSocket s = new MulticastSocket(port);
 		s.joinGroup(group);
 		
 		Scanner scanner = new Scanner(System.in);
 
-		DistanceVector dv = new DistanceVector(InetAddress.getLocalHost(), 0, InetAddress.getLocalHost());
-		ConcurrentHashMap<InetAddress, DistanceVector> hashmap = new ConcurrentHashMap<InetAddress, DistanceVector>();
+		DistanceVectorEntry dv = new DistanceVectorEntry(InetAddress.getLocalHost(), 0, InetAddress.getLocalHost());
+		ConcurrentHashMap<InetAddress, DistanceVectorEntry> hashmap = new ConcurrentHashMap<InetAddress, DistanceVectorEntry>();
 		hashmap.put(InetAddress.getLocalHost(), dv);
-		DistanceVectorThread distanceVectorThread = new DistanceVectorThread(hashmap, group, s);
+		DistanceVectorThread distanceVectorThread = new DistanceVectorThread(hashmap, group, s, port);
 		PacketReceiveThread thread = new PacketReceiveThread(s, group);
 		Thread t = new Thread(thread);
 		Thread dvt = new Thread(distanceVectorThread);
@@ -39,7 +40,7 @@ public class Test {
 			System.arraycopy(destination, 0, rawPacket, 0, destination.length); 
 			System.arraycopy(line.getBytes(), 0, rawPacket, destination.length, line.length());
 			DatagramPacket packet = new DatagramPacket(rawPacket, rawPacket.length,
-					group, 6789);
+					group, port);
 			s.send(packet);
 		} while(!line.equals("quit"));
 		
