@@ -5,7 +5,10 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
+import network.DistanceVector;
+import network.DistanceVectorThread;
 import network.PacketReceiveThread;
 
 public class Test {
@@ -19,9 +22,15 @@ public class Test {
 		
 		Scanner scanner = new Scanner(System.in);
 
+		DistanceVector dv = new DistanceVector(InetAddress.getLocalHost(), 0, InetAddress.getLocalHost());
+		ConcurrentHashMap<InetAddress, DistanceVector> hashmap = new ConcurrentHashMap<InetAddress, DistanceVector>();
+		hashmap.put(InetAddress.getLocalHost(), dv);
+		DistanceVectorThread distanceVectorThread = new DistanceVectorThread(hashmap, group, s);
 		PacketReceiveThread thread = new PacketReceiveThread(s, group);
 		Thread t = new Thread(thread);
+		Thread dvt = new Thread(distanceVectorThread);
 		t.start();
+		dvt.start();
 		
 		String line;
 		do {
@@ -36,20 +45,16 @@ public class Test {
 		
 		scanner.close();
 		thread.wait = false;
+		distanceVectorThread.wait = false;
 		try {
 			t.join();
+			dvt.join();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 
-	}
-
-	private static void print(byte[] bs) {
-		for (byte b : bs)
-			System.out.print((char) b);
-		System.out.println();
 	}
 
 }
