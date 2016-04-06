@@ -42,6 +42,7 @@ class Client {
 	}
 	
 	public void start() {
+		startThreads();
 		handleUserInput();
 	}
 	
@@ -55,6 +56,22 @@ class Client {
 		do {
 			line = in.nextLine();
 		} while(!line.equals("quit"));
+	}
+	
+	private void startThreads() {
+		dvRunnable = new DistanceVectorThread();
+		mlRunnable = new MultiListeningThread();
+		ulRunnable = new UniListeningThread();
+		dvThread = new Thread(dvRunnable);
+		mlThread = new Thread(mlRunnable);
+		ulThread = new Thread(ulRunnable);
+		dvThread.start();
+		mlThread.start();
+		ulThread.start();
+	}
+	
+	private void stopThreads() {
+		
 	}
 
 }
