@@ -137,14 +137,19 @@ public class Packet {
 	public byte[] getBytes() {
 		byte[] result = new byte[BASICL + dataL];
 		System.arraycopy(src.getAddress(),  0, result, 0, 4);
-		System.arraycopy(dest.getHostAddress(), 0, result, 4, 4);
-		System.arraycopy(seqNr, 0, result, 8, 4);
-		System.arraycopy(ackNr, 0, result, 12, 4);
+		System.arraycopy(dest.getAddress(), 0, result, 4, 4);
+		System.arraycopy(Helper.integerToByteArray(seqNr), 0, result, 8, 4);
+		System.arraycopy(Helper.integerToByteArray(ackNr), 0, result, 12, 4);
 		result[16] = flag;
-		System.arraycopy(timeStamp, 0, result, 17, 4);
-		System.arraycopy(TTL, 0, result, 21, 1);
-		System.arraycopy(dataL, 0, result, 22, 4);
-		System.arraycopy(data, 0, result, 26, BASICL + dataL);
+		System.arraycopy(Helper.integerToByteArray(timeStamp), 0, result, 17, 4);
+		System.arraycopy(Helper.integerToByteArray(TTL), 0, result, 21, 1);
+		System.arraycopy(Helper.integerToByteArray(dataL), 0, result, 22, 4);
+		try {
+			System.arraycopy(data.getBytes("UTF-16BE"), 0, result, 26, BASICL + dataL);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return result;
 	}
 
