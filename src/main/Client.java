@@ -42,11 +42,19 @@ class Client {
 	}
 	
 	public void start() {
-		
+		handleUserInput();
 	}
 	
 	public static void main(String[] args) {
 		Client client = new Client();
 		client.start();
 	}
+	
+	private void handleUserInput() {
+		String line = "";
+		do {
+			line = in.nextLine();
+		} while(!line.equals("quit"));
+	}
+
 }
