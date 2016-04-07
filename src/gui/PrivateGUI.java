@@ -5,8 +5,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.net.InetAddress;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,7 +21,7 @@ import javax.swing.JTextField;
 import main.Client;
 import network.Connection;
 
-public class PrivateGUI extends JPanel implements ActionListener  {
+public class PrivateGUI extends JPanel implements ActionListener, WindowListener  {
 	
 	private JTextArea texta, message;
 	private JTextField txtf1;
@@ -26,15 +29,18 @@ public class PrivateGUI extends JPanel implements ActionListener  {
 	private Client client;
 	private InetAddress other;
 	private Connection conn;
+	private HashMap<InetAddress, PrivateGUI> pGUIs;
 	//private MouseListener userSelector;
 	//private JPane test;
 
-    public PrivateGUI(Client client, InetAddress me, InetAddress other, Connection conn) {
+    public PrivateGUI(Client client, InetAddress me, InetAddress other, Connection conn, HashMap<InetAddress, PrivateGUI> pGUIs) {
     	this.client = client;
     	this.other = other;
     	this.conn = conn;
+    	this.pGUIs = pGUIs;
     	JFrame frame = new JFrame(other.toString());
         //frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    	frame.addWindowListener(this);
         this.setBackground(Color.WHITE);
         frame.setContentPane(this);
         frame.setSize(700, 500);
@@ -96,4 +102,46 @@ public class PrivateGUI extends JPanel implements ActionListener  {
     public void messageReceived(String text) {
     	texta.append(text + System.lineSeparator());
     }
+
+	@Override
+	public void windowActivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosed(WindowEvent arg0) {
+		
+		
+	}
+
+	@Override
+	public void windowClosing(WindowEvent arg0) {
+		pGUIs.remove(this.conn.other);
+		this.conn.stop();
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowOpened(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }

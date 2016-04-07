@@ -28,9 +28,13 @@ import network.Connection;
 // Use upper Case in the start of you class names:
 public class GUI extends JPanel implements ActionListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JTextArea texta, message;
-	private JTextField txtf1;
-	private JList users;
+	//private JTextField txtf1;
+//	private JList<InetAddress> users;
 	public DefaultListModel<InetAddress> userList;
 	private JButton send;
 	private JButton attach;
@@ -92,7 +96,7 @@ public class GUI extends JPanel implements ActionListener {
 		// userList.addElement("Bas");
 		// userList.addElement("Christiaan");
 		// userList.addElement("Thierry");
-		JList users = new JList(userList);
+		JList<InetAddress> users = new JList<InetAddress>(userList);
 		users.addMouseListener(userSelector);
 		users.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		users.setLayoutOrientation(JList.VERTICAL);
@@ -173,17 +177,17 @@ public class GUI extends JPanel implements ActionListener {
 		public void mouseClicked(MouseEvent mouseEvent) {
 			JList users = (JList) mouseEvent.getSource();
 			if (mouseEvent.getClickCount() == 2) {
-				Connection conn = new Connection(client, (InetAddress) users.getSelectedValue());
-				privateGUI((InetAddress) users.getSelectedValue(), conn);
+				privateGUI((InetAddress) users.getSelectedValue());
 				// System.out.println("dubbelklik");
 				// JOptionPane.showMessageDialog(GUI.this, "Sjaak!");
 
 			}
 		}
 
-		private void privateGUI(InetAddress other, Connection conn) {
+		private void privateGUI(InetAddress other) {
 			if (pGUIs.get(other) == null) {
-				PrivateGUI pGUI = new PrivateGUI(client, client.getLocalAddress(), other, conn);
+				Connection conn = new Connection(client, other);
+				PrivateGUI pGUI = new PrivateGUI(client, client.getLocalAddress(), other, conn, pGUIs);
 				pGUIs.put(other, pGUI);
 			}
 		}

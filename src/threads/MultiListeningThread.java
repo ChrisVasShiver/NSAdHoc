@@ -25,7 +25,7 @@ public class MultiListeningThread implements Runnable {
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
 				client.multiSocket.receive(recvPacket);
-//				printRoutingTable();
+				printRoutingTable();
 			} catch (IOException e) {e.printStackTrace();}
 			checkTimeoutElapsed();
 			InetAddress sender = null;
@@ -33,6 +33,8 @@ public class MultiListeningThread implements Runnable {
 				sender = InetAddress.getByName(recvPacket.getSocketAddress().toString().split(":")[0].replace("/", ""));
 			} catch (UnknownHostException e) {e.printStackTrace(); }
 			if(sender == client.getLocalAddress())
+				continue;
+			if(sender.toString().equals("/192.168.5.2"))	
 				continue;
 			client.neighbourTimeout.put(sender, System.currentTimeMillis());
 			handleDistanceVectorPacket(buffer, sender);

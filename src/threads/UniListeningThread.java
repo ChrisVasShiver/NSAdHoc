@@ -40,17 +40,14 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 	
 	public void handlePacket(Packet packet) {
 		if(packet.getDest().equals(client.getLocalAddress())) {
-			//TODO what if the packet is for me
-			Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(),0,  packet.getSeqNr(), (byte)0x01, System.currentTimeMillis(), null);
-			DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length, 
-					client.routingTable.get(ackpkt.getDest()).nextHop, client.uniPort);
-			try {
-				client.uniSocket.send(pkt);
-			} catch (IOException e) { e.printStackTrace(); }
 
+			
+			if(packet.getFlag() != 0x01) {
+				sendACK(packet);
+			}
 			setChanged();
 			notifyObservers(packet);
-			this.clearChanged();
+			clearChanged();
 			
 		} else {
 			if(!packet.isExpired()) {
@@ -64,6 +61,14 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 		}
 	}
 
+	public void sendACK(Packet packet) {
+		Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(), 0,  packet.getSeqNr(), (byte)0x01, System.currentTimeMillis(), null);
+		DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length, 
+				client.routingTable.get(ackpkt.getDest()).nextHop, client.uniPort);
+		try {
+			client.uniSocket.send(pkt);
+		} catch (IOException e) { e.printStackTrace(); }
+	}
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		// TODO Auto-generated method stub

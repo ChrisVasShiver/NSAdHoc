@@ -8,7 +8,6 @@ import helper.Packet;
 public class TimerThread extends Observable implements Runnable {
 
 	ConcurrentHashMap<Integer, Packet> packetList = new ConcurrentHashMap<Integer, Packet>();
-	private int lastIndex = 0;
 	public static final long PACKET_TIMEOUT = 2000;
 	public boolean wait = true;
 	public TimerThread() {

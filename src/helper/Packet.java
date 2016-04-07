@@ -3,7 +3,6 @@ package helper;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 
 import main.Client;
 

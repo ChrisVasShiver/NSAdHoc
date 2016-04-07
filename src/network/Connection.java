@@ -17,11 +17,11 @@ public class Connection implements Observer {
 
 	private TimerThread timerRunnable;
 	private Thread timerThread;
-	private InetAddress other;
+	public final InetAddress other;
 	private Client client;
 	private int lastSeqnr = 1;
 	private int lastAcknr = 1;
-	
+
 	public Connection(Client client, InetAddress other) {
 		this.other = other;
 		this.client = client;
@@ -31,50 +31,67 @@ public class Connection implements Observer {
 		timerRunnable.addObserver(this);
 		client.ulRunnable.addObserver(this);
 	}
-	
+
+	public void stop() {
+		timerRunnable.wait = false;
+		try {
+			timerThread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		client.ulRunnable.deleteObserver(this);
+		
+	}
 	public void sendMessage(String message) {
-		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, (byte)0, System.currentTimeMillis(), message);
+		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, (byte) 0, System.currentTimeMillis(),
+				message);
 		sendPacket(packet);
 	}
 
 	public void sendPacket(Packet packet) {
 		DistanceVectorEntry dve = client.routingTable.get(other);
-		if(dve == null) {
+		if (dve == null) {
 			System.out.println("Address " + other.getHostName() + " is not in your routing table.");
 			return;
 		}
-		DatagramPacket dpack = new DatagramPacket(packet.getBytes(), packet.getBytes().length, dve.nextHop, client.uniPort);
+		DatagramPacket dpack = new DatagramPacket(packet.getBytes(), packet.getBytes().length, dve.nextHop,
+				client.uniPort);
 		try {
 			client.uniSocket.send(dpack);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 		timerRunnable.put(lastSeqnr, packet);
 		lastSeqnr++;
 	}
+
 	public void receiveMessage(Packet packet) {
-		if(packet.getFlag() == 0x01) {
+
+		if (packet.getFlag() == 0x01) {
 			timerRunnable.remove(packet.getAckNr());
+			lastAcknr = packet.getAckNr();
 		} else {
-			String message = packet.getSrc().getHostName() + " (" 
-		+ new Date(packet.getTimeStamp()) + "):" + System.lineSeparator() + " " + packet.getData();
+			String message = packet.getSrc().getHostName() + " (" + new Date(packet.getTimeStamp()) + "):"
+					+ System.lineSeparator() + " " + packet.getData();
 			client.messageReceived(packet.getSrc(), message);
 		}
 	}
 
 	@Override
 	public void update(Observable arg0, Object packet) {
-		if(arg0 instanceof UniListeningThread) {
-			if(((Packet)packet).getDest().equals(client.getLocalAddress())) {
-				receiveMessage((Packet)packet);
+		if (arg0 instanceof UniListeningThread) {
+			if (((Packet) packet).getDest().equals(client.getLocalAddress()) && ((Packet) packet).getSrc().equals(other)) {
+				receiveMessage((Packet) packet);
 			}
 		}
-		if(arg0 instanceof TimerThread) {
-			Packet newPacket = (Packet)packet;
+		if (arg0 instanceof TimerThread) {
+			Packet newPacket = (Packet) packet;
 			newPacket.setTimeStamp(System.currentTimeMillis());
 			sendPacket(newPacket);
 		}
-				
+
 	}
 }
