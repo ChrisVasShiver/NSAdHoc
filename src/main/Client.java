@@ -1,22 +1,31 @@
 package main;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
+
+import gui.GUI;
 import helper.DistanceVectorEntry;
 import helper.Packet;
+import helper.RoutingTable;
 import threads.DistanceVectorThread;
 import threads.MultiListeningThread;
+import threads.TimerThread;
 import threads.UniListeningThread;
 
-public class Client {
-	public ConcurrentHashMap<InetAddress, DistanceVectorEntry> routingTable = new ConcurrentHashMap<InetAddress, DistanceVectorEntry>();
+public class Client implements Observer {
+	public RoutingTable routingTable = new RoutingTable();
 	public ConcurrentHashMap<InetAddress, Long> neighbourTimeout = new ConcurrentHashMap<InetAddress, Long>();
 	private Scanner in = new Scanner(System.in);
 	
@@ -25,17 +34,21 @@ public class Client {
 	private Thread ulThread;
 	private DistanceVectorThread dvRunnable;
 	private MultiListeningThread mlRunnable;
-	private UniListeningThread ulRunnable;
+	public UniListeningThread ulRunnable;
+	
+	private GUI gui = new GUI(this);
 	
 	public MulticastSocket multiSocket;
 	public InetAddress group;
 	public final int multiPort = 6789;
 	public DatagramSocket uniSocket;
 	public final int uniPort = 7000;
-	public final int sendTimeout = 3000;
+	public static final int sendTimeout = 3000;
+	public static final int MAX_PACKET_SIZE = 2048;
 	
 	public Client() {
 		InetAddress localAddress = getLocalAddress();
+		routingTable.addObserver(this);
 		DistanceVectorEntry defaultEntry = new DistanceVectorEntry(localAddress, 0, localAddress);
 		routingTable.put(localAddress, defaultEntry);
 		try {
@@ -51,6 +64,7 @@ public class Client {
 	
 	public void start() {
 		startThreads();
+		startGUI();
 		handleUserInput();
 		stopThreads();
 		multiSocket.close();
@@ -80,21 +94,18 @@ public class Client {
 				e.printStackTrace();
 				continue;
 			}
-			Packet pack = new Packet(getLocalAddress(), dest, 0, 0, 0, line);
-			DistanceVectorEntry dve = routingTable.get(dest);
-			if(dve == null) {
-				System.out.println("Address " + dest.getHostName() + " is not in your routing table.");
-				continue;
-			}
-			DatagramPacket dpack = new DatagramPacket(pack.getBytes(), pack.getBytes().length, dve.nextHop, uniPort);
-			try {
-				uniSocket.send(dpack);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			sendMessage(dest, line);
 			
 		} while(!line.equals("quit"));
+	}
+	
+	public void startGUI() {
+		 JFrame frame = new JFrame("Chatbox");
+	     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+	     gui.setBackground(Color.WHITE);
+	     frame.setContentPane(gui);
+	     frame.setSize(700, 500);
+	     frame.setVisible(true);
 	}
 	
 	private void startThreads() {
@@ -124,4 +135,23 @@ public class Client {
 		
 	}
 
+	public void sendMessage(InetAddress address, String message) {
+		
+	}
+
+	public void messageReceived(InetAddress source, String message) {
+		for(InetAddress address : gui.pGUIs.keySet()) {
+			if(source.equals(address)) {
+				gui.pGUIs.get(address).messageReceived(message);
+			}
+		}
+	}
+	
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		gui.userList.removeAllElements();
+		for(InetAddress address : routingTable.keySet()) {
+	    	 gui.userList.addElement(address);
+	     }
+	}
 }

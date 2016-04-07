@@ -21,7 +21,7 @@ public class DistanceVectorThread implements Runnable {
 		while(wait) {
 			try {
 				client.multiSocket.send(getDatagramPacket());
-				Thread.sleep(client.sendTimeout);
+				Thread.sleep(Client.sendTimeout);
 			} catch (InterruptedException | IOException e) { e.printStackTrace(); }
 		}
 	}

@@ -25,7 +25,7 @@ public class MultiListeningThread implements Runnable {
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
 				client.multiSocket.receive(recvPacket);
-				printRoutingTable();
+//				printRoutingTable();
 			} catch (IOException e) {e.printStackTrace();}
 			checkTimeoutElapsed();
 			InetAddress sender = null;
@@ -87,7 +87,7 @@ public class MultiListeningThread implements Runnable {
 	private void checkTimeoutElapsed() {
 		for(InetAddress address : client.neighbourTimeout.keySet()) {
 			long now = System.currentTimeMillis();
-			if(now - client.neighbourTimeout.get(address) > 3 * client.sendTimeout) {
+			if(now - client.neighbourTimeout.get(address) > 3 * Client.sendTimeout) {
 				removeEntries(address);
 			}
 		}
