@@ -42,6 +42,8 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	private SingleConnection conn;
 	private HashMap<InetAddress, PrivateGUI> pGUIs;
 	private JFileChooser fc;
+	private JScrollPane scrollPane;
+	private JScrollPane scrollMessage;
 	JFrame frame;
 	private FlickIcon flickicon;
 	private boolean getNotification = false;
@@ -93,22 +95,25 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
         texta.setBackground(Color.WHITE);
         texta.setForeground(Color.BLACK);
         texta.setCaretPosition(texta.getDocument().getLength());
-        JScrollPane scrollPane = new JScrollPane(texta);
+        scrollPane = new JScrollPane(texta);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(675, 300));
         scrollPane.setLocation(0, 0);
         add(scrollPane);
         
         message = new JTextPane();
+        message.addKeyListener(sendText);
         //message.setLineWrap(true);
         //message.setWrapStyleWord(true);
-        JScrollPane scrollMessage= new JScrollPane(message);
+        scrollMessage= new JScrollPane(message);
         scrollMessage.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollMessage.setPreferredSize(new Dimension(500, 100));
         scrollMessage.setLocation(0, 320);
         add(scrollMessage);
         
-        JButton send = new JButton("Send");
+        
+        
+        send = new JButton("Send");
         send.addActionListener(this);
         send.setPreferredSize(new Dimension(170, 100));
         add(send);
