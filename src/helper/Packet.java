@@ -7,6 +7,9 @@ import java.net.UnknownHostException;
 import main.Client;
 
 public class Packet {
+	public final static byte ACK = 0x01;
+	public final static byte SYN = 0x02;
+	public final static byte FIN = 0x04;
 	private final static int BASICL = 30;
 	private final static int BASICTTL = 12;
 	private InetAddress src;
