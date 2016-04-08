@@ -16,6 +16,7 @@ import java.awt.event.WindowListener;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import javax.swing.DefaultListModel;
@@ -51,6 +52,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	public HashMap<InetAddress, PrivateGUI> pGUIs = new HashMap<InetAddress, PrivateGUI>();
 	private JFileChooser fc;
 	private Client client;
+	private Connection connections;
 	// private MouseListener userSelector;
 	// private JPane test;
 	
@@ -58,7 +60,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	FileFilter pdfFilter = new FileTypeFilter(".pdf", "PDF Documents");
 	FileFilter xlsFilter = new FileTypeFilter(".xlsx", "Microsoft Excel Documents");
 	FileFilter jpgFilter = new FileTypeFilter(".jpg", "JPG Image"); 
-
+	
 	public GUI(Client client) {
 		this.client = client;
 		buildGUI();
@@ -138,15 +140,9 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		   
 		   
 		   public void actionPerformed(ActionEvent e){
-	            if(e.getSource() == send && (!message.getText().isEmpty())){
-	                String text = message.getText();
-	                String showntext = texta.getText();
-	                //texta.append(text + System.lineSeparator());
-	                texta.setText(showntext + getTime() + text + System.lineSeparator());
-	                message.setText(null);
-	                // TODO Auto-generated method stub
-	                //Hier kan verzendmethode komen
-	            }
+               if(e.getSource() == send && (!message.getText().isEmpty())){
+            	   sendMessage(message.getText());
+               }
 	            if(e.getSource() == attach){
 	                System.out.println("attach");
 	                JFrame fileChooser = new JFrame();
@@ -206,6 +202,28 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 			pGUIs.get(other).requestFocus();
 		}
 	}
+	
+	public void setGroupConnetions() {
+		InetAddress[] allUsers =  new InetAddress[userList.size()];
+		for(int i = 0; i < userList.size(); i ++) {
+			allUsers[i] = userList.getElementAt(i);
+		}
+		connections = new Connection(client, allUsers);
+	}
+	
+    public void sendMessage(String text) {
+    	String oldText = texta.getText();
+    	texta.setText(oldText + client.getLocalAddress().getHostName() + " (" 
+    			+ new Date(System.currentTimeMillis()) + "):" 
+    			+ System.lineSeparator() + " " + text + System.lineSeparator());
+    	message.setText(null);
+    	try {
+    		connections.sendMessage(text);
+    	} catch(Exception e) {
+    		System.out.println("There are no other clients connected");
+    	}
+    	
+    }
 	/*
 	 * public void jListUsernameMouseClicked(java.awt.event.MouseEvent evt){
 	 * System.out.println("klik"); JList users = (JList)evt.getSource();

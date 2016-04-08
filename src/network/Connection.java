@@ -43,6 +43,10 @@ public class Connection implements Observer {
 		client.ulRunnable.addObserver(this);
 		sendSYN();
 	}
+	
+	public boolean hasOthers() {
+		return (other.length > 0);
+	}
 
 	public void stop() {
 		timerRunnable.wait = false;
