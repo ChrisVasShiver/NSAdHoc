@@ -34,20 +34,17 @@ public class SymmetricEncryption {
 		return key;
 	}
 
-	public byte[] encrypt(String input, Key key) throws InvalidKeyException,
+	public byte[] encrypt(byte[] input, Key key) throws InvalidKeyException,
 			BadPaddingException, IllegalBlockSizeException {
 		aescipher.init(Cipher.ENCRYPT_MODE, key);
-		byte[] inputBytes = input.getBytes();
-		return aescipher.doFinal(inputBytes);
+		return aescipher.doFinal(input);
 	}
 
-	public String decrypt(byte[] encryptionBytes, Key key)
+	public byte[] decrypt(byte[] encryptionBytes, Key key)
 			throws InvalidKeyException, BadPaddingException,
 			IllegalBlockSizeException {
 		aescipher.init(Cipher.DECRYPT_MODE, key);
-		byte[] recoveredBytes = aescipher.doFinal(encryptionBytes);
-		String recovered = new String(recoveredBytes);
-		return recovered;
+		return aescipher.doFinal(encryptionBytes);
 	}
 
 }

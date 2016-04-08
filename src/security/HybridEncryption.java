@@ -7,22 +7,19 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base64;
-
 public class HybridEncryption {
 	
 // for testing the code
 	
-//	 public static void main(String[] args) throws Exception{
-//		 HybridEncryption hb = new HybridEncryption();
-//		 String key = hb.generateEncryptedKey();
-//		 System.out.println(hb.secretKey.toString());
-//		 hb.decryptAndStoreKey(key);
-//		 System.out.println(hb.secretKey);	 
-//		 byte[] m = hb.encryptMessage("Hello World");
-//		 String message = hb.decryptMessage(m);
-//		 System.out.println(message);		 
-//	 }
+	 public static void main(String[] args) throws Exception{
+		 HybridEncryption hb = new HybridEncryption();
+		 byte[] publicKey = hb.getPublicKey();
+		 byte[] key = hb.generateEncryptedKey(publicKey);
+		 hb.decryptAndStoreKey(key);	 
+		 byte[] m = hb.encryptMessage("Hello World".getBytes("ASCII"));
+		 byte[] message = hb.decryptMessage(m);
+		 System.out.println(new String(message, "ASCII"));		 
+	 }
 	
 	public Key secretKey;
 	SymmetricEncryption symEn;
@@ -33,34 +30,36 @@ public class HybridEncryption {
 		asEn = new AsymmetricEncryption();
 	}
 
-	public String generateEncryptedKey(){
+	public byte[] generateEncryptedKey(byte[] publicKey){
 		try {
 			secretKey = symEn.generateKey();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		String keyToString = Base64.encodeBase64String(secretKey.getEncoded());
-		String encryptedKey = null;
+		byte[] keyToString = secretKey.getEncoded();
+		byte[] encryptedKey = null;
 		try {
-			encryptedKey = asEn.encrypt(keyToString);
+			encryptedKey = asEn.encrypt(keyToString, publicKey);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return encryptedKey;
 	}
 
-	public void decryptAndStoreKey(String encryptedKey){
-		String decryptedKey = null;
+	public byte[] getPublicKey() {
+		return asEn.getPublicKey().getEncoded();
+	}
+	public void decryptAndStoreKey(byte[] encryptedKey){
+		byte[] decryptedKey = null;
 		try {
 			decryptedKey = asEn.decrypt(encryptedKey);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		byte keyBytes[] = Base64.decodeBase64(decryptedKey);
-		secretKey = new SecretKeySpec(keyBytes, 0, keyBytes.length, "AES");
+		secretKey = new SecretKeySpec(decryptedKey, 0, decryptedKey.length, "AES");
 	}
 
-	public byte[] encryptMessage(String message){
+	public byte[] encryptMessage(byte[] message){
 		byte[] encryptedMessage = null;
 		try {
 			encryptedMessage = symEn.encrypt(message, secretKey);
@@ -74,18 +73,13 @@ public class HybridEncryption {
 		return encryptedMessage;
 	}
 
-	public String decryptMessage(byte[] encryptedMessage){
-		String decryptedMessage = null;
+	public byte[] decryptMessage(byte[] encryptedMessage){
+		byte[] decryptedMessage = null;
 		try {
 			decryptedMessage = symEn.decrypt(encryptedMessage, secretKey);
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
+		} catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
 			e.printStackTrace();
 		}
 		return decryptedMessage;
 	}
-
 }

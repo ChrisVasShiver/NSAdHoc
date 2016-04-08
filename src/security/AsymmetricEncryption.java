@@ -1,14 +1,14 @@
 package security;
 
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.Cipher;
-
-import org.apache.commons.codec.binary.Base64;
 
 public class AsymmetricEncryption {
 
@@ -32,28 +32,22 @@ public class AsymmetricEncryption {
 		publicKey = keyPair.getPublic();
 	}
 
-	public PrivateKey getPrivateKey() {
-		return privateKey;
-	}
-
 	public PublicKey getPublicKey() {
 		return publicKey;
 	}
 
-	public String encrypt(String dataToBeEncrypted) throws Exception {
+	public byte[] encrypt(byte[] dataToBeEncrypted, byte[] publicKeyBytes) throws Exception {
 		Cipher cipher = Cipher.getInstance("RSA");
+		PublicKey publicKey = 
+			    KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(publicKeyBytes));
 		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		String encryptedData = Base64.encodeBase64String(cipher
-				.doFinal(dataToBeEncrypted.getBytes()));
-		return encryptedData;
+		return cipher.doFinal(dataToBeEncrypted);
 	}
 
-	public String decrypt(String encryptedData) throws Exception {
+	public byte[] decrypt(byte[] encryptedData) throws Exception {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		String decryptedData = new String(cipher.doFinal(Base64
-				.decodeBase64(encryptedData)));
-		return decryptedData;
+		return cipher.doFinal(encryptedData);
 	}
 
 }
