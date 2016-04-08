@@ -48,7 +48,8 @@ public class Client implements Observer {
 		InetAddress localAddress = getLocalAddress();
 		routingTable.addObserver(this);
 		DistanceVectorEntry defaultEntry = new DistanceVectorEntry(localAddress, 0, localAddress);
-		routingTable.put(localAddress, defaultEntry);
+		if(localAddress != null)
+			routingTable.put(localAddress, defaultEntry);
 		try {
 			group = InetAddress.getByName("228.0.0.2");
 			multiSocket = new MulticastSocket(multiPort);
@@ -63,12 +64,15 @@ public class Client implements Observer {
 	public void start() {
 		startThreads();
 		startGUI();
-		handleUserInput();
+		
+	}
+	
+	public void stop() {
 		stopThreads();
 		multiSocket.close();
 		uniSocket.close();
+		System.out.println("Client closed");
 	}
-	
 	public InetAddress getLocalAddress() {
 		InetAddress result = null;
 		try {
@@ -79,22 +83,6 @@ public class Client implements Observer {
 	public static void main(String[] args) {
 		Client client = new Client();
 		client.start();
-	}
-	
-	private void handleUserInput() {
-		String line = "";
-		do {
-			line = in.nextLine();
-			InetAddress dest;
-			try {
-				dest = InetAddress.getByName("192.168.5." + line.toCharArray()[0]);
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-				continue;
-			}
-			//sendMessage(dest, line);
-			
-		} while(!line.equals("quit"));
 	}
 	
 	public void startGUI() {
@@ -135,13 +123,13 @@ public class Client implements Observer {
 
 	public void startPrivateGUI(InetAddress address) {
 				gui.privateGUI(address);
-			}
+	}
 			
-			public void stopPrivateGUI(InetAddress address) {
-				PrivateGUI pGUI = gui.pGUIs.get(address);
-				if(pGUI != null)
-					pGUI.texta.append(address.getHostName() + " closed the connection");
-			}
+	public void stopPrivateGUI(InetAddress address) {
+		PrivateGUI pGUI = gui.pGUIs.get(address);
+		if (pGUI != null)
+			pGUI.texta.append(address.getHostName() + " closed the connection" + System.lineSeparator());
+	}
 
 	public void messageReceived(InetAddress source, String message) {
 		for(InetAddress address : gui.pGUIs.keySet()) {
