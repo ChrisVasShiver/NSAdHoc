@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import helper.AudioPlayer;
 import main.Client;
 import network.Connection;
 
@@ -100,7 +101,16 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     	conn.sendMessage(text);
     }
     public void messageReceived(String text) {
+    	AudioPlayer a = new AudioPlayer();
+    	a.start();
+    	a.playSound("newmsg.wav");
     	texta.append(text + System.lineSeparator());
+    	try {
+			a.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 	@Override

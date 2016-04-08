@@ -25,14 +25,14 @@ public class MultiListeningThread implements Runnable {
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
 				client.multiSocket.receive(recvPacket);
-//				printRoutingTable();
+				printRoutingTable();
 			} catch (IOException e) {e.printStackTrace();}
 			checkTimeoutElapsed();
 			InetAddress sender = null;
 			try {
 				sender = InetAddress.getByName(recvPacket.getSocketAddress().toString().split(":")[0].replace("/", ""));
 			} catch (UnknownHostException e) {e.printStackTrace(); }
-			if(sender == client.getLocalAddress())
+			if(sender.equals(client.getLocalAddress()))
 				continue;
 //			if(sender.toString().equals("/192.168.5.2"))	
 //				continue;
@@ -97,7 +97,7 @@ public class MultiListeningThread implements Runnable {
 	
 	private void removeEntries(InetAddress node) {
 		for(InetAddress address : client.routingTable.keySet())
-			if(client.routingTable.get(address).nextHop == node) 
+			if(client.routingTable.get(address).nextHop.equals(node)) 
 				client.routingTable.remove(address);
 		client.routingTable.remove(node);
 	}
