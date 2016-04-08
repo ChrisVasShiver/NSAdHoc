@@ -44,7 +44,7 @@ public class Client implements Observer {
 	public DatagramSocket uniSocket;
 	public final int uniPort = 7000;
 	public static final int sendTimeout = 3000;
-	public static final int MAX_PACKET_SIZE = 2048;
+	public static final int MAX_PACKET_SIZE = 1024;
 	
 	public Client() {
 		InetAddress localAddress = getLocalAddress();

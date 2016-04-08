@@ -42,12 +42,6 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 		if(packet == null)
 			return;
 		if(packet.getDest().equals(client.getLocalAddress())) {
-
-			System.out.println("Flag: " + packet.getFlag());
-			if(packet.getFlag() != Packet.ACK) {
-				sendACK(packet);
-			}
-			
 			setChanged();
 			notifyObservers(packet);
 			clearChanged();
@@ -67,15 +61,7 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 		}
 	}
 
-	public void sendACK(Packet packet) {
-		System.out.println("ACK sent");
-		Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(), 0,  packet.getSeqNr(), (byte)0x01, System.currentTimeMillis(), 0, 0, null);
-		DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length, 
-				client.routingTable.get(ackpkt.getDest()).nextHop, client.uniPort);
-		try {
-			client.uniSocket.send(pkt);
-		} catch (IOException e) { e.printStackTrace(); }
-	}
+	
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		// TODO Auto-generated method stub

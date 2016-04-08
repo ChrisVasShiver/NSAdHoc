@@ -1,20 +1,21 @@
 package helper;
 
+import java.util.List;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import main.Client;
-
-public class Packet {
+public class Packet implements Comparable<Packet> {
 	public final static byte ACK = 0x01; // Acknowledgement
 	public final static byte SYN = 0x02; // Synchronize
 	public final static byte FIN = 0x04; // Finish
 	public final static byte GRP = 0x08; // Group
 	public final static byte FRG = 0x10; // Fragmented
-	public final static int HEADER_SIZE = 38;
+	public final static byte LST = 0x20; // Last fragment
+	public final static int HEADER_SIZE = 42;
 	public final static String ENCODING = "UTF-16BE";
 	private final static int BASICTTL = 12;
+	private int packetNumber = 0;
 	private InetAddress src;
 	private InetAddress dest;
 	private int seqNr;
@@ -68,6 +69,7 @@ public class Packet {
 		byte[] fragmentNr = new byte[4];
 		byte[] offset = new byte[4];
 		byte[] dataL = new byte[4];
+		byte[] packetID = new byte[4];
 		System.arraycopy(raw,  0, src, 0, 4);
 		this.src = InetAddress.getByAddress(src);
 		System.arraycopy(raw, 4, dest, 0, 4);
@@ -82,10 +84,12 @@ public class Packet {
 		this.fragmentNr = Helper.byteArrayToInteger(fragmentNr);
 		System.arraycopy(raw, 30, offset, 0, 4);
 		this.offset = Helper.byteArrayToInteger(offset);
-		System.arraycopy(raw, 34, dataL, 0, 4);
+		System.arraycopy(raw, 34, packetID, 0, 4);
+		this.packetNumber = Helper.byteArrayToInteger(packetID);
+		System.arraycopy(raw, 38, dataL, 0, 4);
 		this.dataL = Helper.byteArrayToInteger(dataL);
 		byte[] data = new byte[this.dataL];
-		System.arraycopy(raw, 38, data, 0, this.dataL);
+		System.arraycopy(raw, 42, data, 0, this.dataL);
 		this.data = dataToString(data);
 	}
 	
@@ -101,9 +105,10 @@ public class Packet {
 		System.arraycopy(Helper.integerToByteArray(TTL), 0, result, 25, 1);
 		System.arraycopy(Helper.integerToByteArray(fragmentNr), 0, result, 26, 4);
 		System.arraycopy(Helper.integerToByteArray(offset), 0, result, 30, 4);
-		System.arraycopy(Helper.integerToByteArray(dataL), 0, result, 34, 4);
+		System.arraycopy(Helper.integerToByteArray(packetNumber), 0, result, 34, 4);
+		System.arraycopy(Helper.integerToByteArray(dataL), 0, result, 38, 4);
 		if(data != null)
-			System.arraycopy(dataToByteArray(data), 0, result, 38, dataL);
+			System.arraycopy(dataToByteArray(data), 0, result, 42, dataL);
 		return result;
 	}
 	
@@ -119,6 +124,13 @@ public class Packet {
 		try { result = new String(data, ENCODING);
 		} catch (UnsupportedEncodingException e) {e.printStackTrace();}
 		return result;
+	}
+
+	public static String dataToString(List<Byte> data) {
+		byte[] result = new byte[data.size()];
+		for(int i = 0; i < data.size(); i++)
+			result[i] = (byte)data.get(i);
+		return dataToString(result);
 	}
 	
 	public static byte[] dataToByteArray(String data) {
@@ -193,6 +205,13 @@ public class Packet {
 		TTL = tTL;
 	}
 
+	public int getPacketID() {
+		return packetNumber;
+	}
+	
+	public void setPacketID(int ID) {
+		packetNumber = ID;
+	}
 	public int getDataL() {
 		return dataL;
 	}
@@ -229,6 +248,16 @@ public class Packet {
 	@Override
 	public String toString() {
 		return "Packet: " + getData();
+	}
+
+	@Override
+	public int compareTo(Packet other) {
+		if(other.getFragmentNr() < this.fragmentNr)
+			return -1;
+		else if(other.getFragmentNr() == this.fragmentNr)
+			return 0;
+		else
+			return 1;
 	}
 
 

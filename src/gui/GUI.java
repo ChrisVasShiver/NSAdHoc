@@ -33,7 +33,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.filechooser.FileFilter;
 
 import main.Client;
-import network.Connection;
+import network.SingleConnection;
 
 // Use upper Case in the start of you class names:
 public class GUI extends JPanel implements ActionListener, WindowListener {
@@ -52,7 +52,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	public HashMap<InetAddress, PrivateGUI> pGUIs = new HashMap<InetAddress, PrivateGUI>();
 	private JFileChooser fc;
 	private Client client;
-	private Connection connections;
+	private SingleConnection connections;
 	// private MouseListener userSelector;
 	// private JPane test;
 	
@@ -195,7 +195,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 
 	public void privateGUI(InetAddress other) {
 		if (pGUIs.get(other) == null) {
-			Connection conn = new Connection(client, other);
+			SingleConnection conn = new SingleConnection(client, other);
 			PrivateGUI pGUI = new PrivateGUI(client, client.getLocalAddress(), other, conn, pGUIs);
 			pGUIs.put(other, pGUI);
 		} else {
@@ -208,7 +208,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		for(int i = 0; i < userList.size(); i ++) {
 			allUsers[i] = userList.getElementAt(i);
 		}
-		connections = new Connection(client, allUsers);
+		//connections = new Connection1(client, allUsers);
 	}
 	
     public void sendMessage(String text) {

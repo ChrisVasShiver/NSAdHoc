@@ -30,7 +30,7 @@ import javax.swing.filechooser.FileFilter;
 
 import helper.AudioPlayer;
 import main.Client;
-import network.Connection;
+import network.SingleConnection;
 
 public class PrivateGUI extends JPanel implements ActionListener, WindowListener  {
 	
@@ -39,7 +39,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	private JButton send, attach;
 	private Client client;
 	private InetAddress other;
-	private Connection conn;
+	private SingleConnection conn;
 	private HashMap<InetAddress, PrivateGUI> pGUIs;
 	private JFileChooser fc;
 	JFrame frame;
@@ -52,7 +52,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     FileFilter xlsFilter = new FileTypeFilter(".xlsx", "Microsoft Excel Documents");
     FileFilter jpgFilter = new FileTypeFilter(".jpg", "JPG Image");
 
-    public PrivateGUI(Client client, InetAddress me, InetAddress other, Connection conn, HashMap<InetAddress, PrivateGUI> pGUIs) {
+    public PrivateGUI(Client client, InetAddress me, InetAddress other, SingleConnection conn, HashMap<InetAddress, PrivateGUI> pGUIs) {
     	flickicon = new FlickIcon(this);
     	this.client = client;
     	this.other = other;
