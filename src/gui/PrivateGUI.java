@@ -10,10 +10,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -39,6 +42,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	private Connection conn;
 	private HashMap<InetAddress, PrivateGUI> pGUIs;
 	private JFileChooser fc;
+	private JFrame frame;
 	//private MouseListener userSelector;
 	//private JPane test;
 	FileFilter docFilter = new FileTypeFilter(".docx", "Microsoft Word Documents");
@@ -51,13 +55,19 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     	this.other = other;
     	this.conn = conn;
     	this.pGUIs = pGUIs;
-    	JFrame frame = new JFrame(other.toString());
+    	frame = new JFrame(other.toString());
         //frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     	frame.addWindowListener(this);
         this.setBackground(Color.WHITE);
         frame.setContentPane(this);
         frame.setSize(700, 500);
         frame.setVisible(true);
+        try {
+			frame.setIconImage(ImageIO.read(new File("msn.png")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         buildGUI();
     }
 
@@ -163,6 +173,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     	AudioPlayer a = new AudioPlayer();
     	a.start();
     	a.playSound("newmsg.wav");
+    	flickicon();
     	texta.setText(oldText + text + System.lineSeparator());
     	try {
 			a.join();
@@ -170,6 +181,22 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    }
+    
+    public void flickicon(){
+    	int counter = 20;
+    	if(counter > 0){
+    	try {
+			frame.setIconImage(ImageIO.read(new File("msn_black.png")));
+			this.wait(500);
+			frame.setIconImage(ImageIO.read(new File("msn.png")));
+			counter--;
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	}
+    	
     }
 
 	@Override
