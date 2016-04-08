@@ -2,7 +2,6 @@ package main;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -16,12 +15,11 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import gui.GUI;
+import gui.PrivateGUI;
 import helper.DistanceVectorEntry;
-import helper.Packet;
 import helper.RoutingTable;
 import threads.DistanceVectorThread;
 import threads.MultiListeningThread;
-import threads.TimerThread;
 import threads.UniListeningThread;
 
 public class Client implements Observer {
@@ -136,7 +134,7 @@ public class Client implements Observer {
 	}
 
 	public void sendMessage(InetAddress address, String message) {
-		
+		throw new UnsupportedOperationException();
 	}
 
 	public void messageReceived(InetAddress source, String message) {
@@ -145,6 +143,16 @@ public class Client implements Observer {
 				gui.pGUIs.get(address).messageReceived(message);
 			}
 		}
+	}
+	
+	public void startPrivateGUI(InetAddress address) {
+		gui.privateGUI(address);
+	}
+	
+	public void stopPrivateGUI(InetAddress address) {
+		PrivateGUI pGUI = gui.pGUIs.get(address);
+		if(pGUI != null)
+			pGUI.texta.append(address.getHostName() + " closed the connection");
 	}
 	
 	@Override

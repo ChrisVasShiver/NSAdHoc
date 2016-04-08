@@ -173,7 +173,7 @@ public class GUI extends JPanel implements ActionListener {
 	 * }
 	 */
 
-	MouseListener userSelector = new MouseAdapter() {
+	public MouseListener userSelector = new MouseAdapter() {
 		public void mouseClicked(MouseEvent mouseEvent) {
 			JList users = (JList) mouseEvent.getSource();
 			if (mouseEvent.getClickCount() == 2) {
@@ -184,15 +184,18 @@ public class GUI extends JPanel implements ActionListener {
 			}
 		}
 
-		private void privateGUI(InetAddress other) {
-			if (pGUIs.get(other) == null) {
-				Connection conn = new Connection(client, other);
-				PrivateGUI pGUI = new PrivateGUI(client, client.getLocalAddress(), other, conn, pGUIs);
-				pGUIs.put(other, pGUI);
-			}
-		}
+		
 	};
 
+	public void privateGUI(InetAddress other) {
+		if (pGUIs.get(other) == null) {
+			Connection conn = new Connection(client, other);
+			PrivateGUI pGUI = new PrivateGUI(client, client.getLocalAddress(), other, conn, pGUIs);
+			pGUIs.put(other, pGUI);
+		} else {
+			pGUIs.get(other).requestFocus();
+		}
+	}
 	/*
 	 * public void jListUsernameMouseClicked(java.awt.event.MouseEvent evt){
 	 * System.out.println("klik"); JList users = (JList)evt.getSource();

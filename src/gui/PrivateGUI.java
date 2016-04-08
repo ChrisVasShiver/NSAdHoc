@@ -23,7 +23,7 @@ import network.Connection;
 
 public class PrivateGUI extends JPanel implements ActionListener, WindowListener  {
 	
-	private JTextArea texta, message;
+	public JTextArea texta, message;
 	private JTextField txtf1;
 	private JButton send;
 	private Client client;
