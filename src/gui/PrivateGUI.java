@@ -42,7 +42,8 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	private Connection conn;
 	private HashMap<InetAddress, PrivateGUI> pGUIs;
 	private JFileChooser fc;
-	private JFrame frame;
+	JFrame frame;
+	private FlickIcon flickicon;
 	private boolean getNotification = false;
 	//private MouseListener userSelector;
 	//private JPane test;
@@ -52,6 +53,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     FileFilter jpgFilter = new FileTypeFilter(".jpg", "JPG Image");
 
     public PrivateGUI(Client client, InetAddress me, InetAddress other, Connection conn, HashMap<InetAddress, PrivateGUI> pGUIs) {
+    	flickicon = new FlickIcon(this);
     	this.client = client;
     	this.other = other;
     	this.conn = conn;
@@ -175,7 +177,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     	a.start();
     	a.playSound("newmsg.wav");
     	if (getNotification)
-    		flickicon();
+    		flickicon.run();
     	texta.setText(oldText + text + System.lineSeparator());
     	try {
 			a.join();
@@ -185,20 +187,20 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		}
     }
     
-    public void flickicon(){
+    /*public void flickicon(){
     	for(int counter =20; counter> 0; counter--){
     	try {
 			frame.setIconImage(ImageIO.read(new File("msn_black.png")));
-			this.wait(500);
+			flick.wait(500);
 			frame.setIconImage(ImageIO.read(new File("msn.png")));
-			this.wait(500);
+			flick.wait(500);
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	}
     	
-    }
+    }*/
 
 	@Override
 	public void windowActivated(WindowEvent arg0) {
