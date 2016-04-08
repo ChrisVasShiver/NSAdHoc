@@ -88,7 +88,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	
 	        add(scrollPane);
 	       
-	        DefaultListModel<InetAddress> userList = new DefaultListModel<InetAddress>();
+	        userList = new DefaultListModel<InetAddress>();
 	        users = new JList<InetAddress>(userList);
 	        users.addMouseListener(userSelector);
 	        users.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
