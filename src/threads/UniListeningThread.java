@@ -69,7 +69,7 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 
 	public void sendACK(Packet packet) {
 		System.out.println("ACK sent");
-		Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(), 0,  packet.getSeqNr(), (byte)0x01, System.currentTimeMillis(), null);
+		Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(), 0,  packet.getSeqNr(), (byte)0x01, System.currentTimeMillis(), 0, 0, null);
 		DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length, 
 				client.routingTable.get(ackpkt.getDest()).nextHop, client.uniPort);
 		try {
