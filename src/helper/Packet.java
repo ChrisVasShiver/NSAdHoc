@@ -148,6 +148,7 @@ public class Packet {
 	}
 	
 	public void decreaseTTL() {
+		System.out.println("Decrease TLL");
 		TTL--;
 	}
 	

@@ -39,29 +39,36 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 	}
 	
 	public void handlePacket(Packet packet) {
+		if(packet == null)
+			return;
 		if(packet.getDest().equals(client.getLocalAddress())) {
 
-			
-			if(packet.getFlag() != 0x01) {
+			System.out.println("Flag: " + packet.getFlag());
+			if(packet.getFlag() != Packet.ACK) {
 				sendACK(packet);
 			}
+			
 			setChanged();
 			notifyObservers(packet);
 			clearChanged();
 			
 		} else {
-			if(!packet.isExpired()) {
+			if(true) {
+				System.out.println("TTL: " + packet.getTTL());
+				System.out.println("handlePacket notExpired");
 				packet.decreaseTTL();
 				DatagramPacket pkt = new DatagramPacket(packet.getBytes(), packet.getBytes().length,
 						client.routingTable.get(packet.getDest()).nextHop, client.uniPort);
 				try {
 					client.uniSocket.send(pkt);
 				} catch (IOException e) { e.printStackTrace(); }
+				System.out.println("Packet resend");
 			}
 		}
 	}
 
 	public void sendACK(Packet packet) {
+		System.out.println("ACK sent");
 		Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(), 0,  packet.getSeqNr(), (byte)0x01, System.currentTimeMillis(), null);
 		DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length, 
 				client.routingTable.get(ackpkt.getDest()).nextHop, client.uniPort);
