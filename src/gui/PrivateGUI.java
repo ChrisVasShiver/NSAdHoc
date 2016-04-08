@@ -40,8 +40,6 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	private Client client;
 	private InetAddress other;
 	private Connection conn;
-	private JScrollPane scrollPane;
-	private JScrollPane scrollMessage;
 	private HashMap<InetAddress, PrivateGUI> pGUIs;
 	private JFileChooser fc;
 	JFrame frame;
@@ -95,7 +93,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
         texta.setBackground(Color.WHITE);
         texta.setForeground(Color.BLACK);
         texta.setCaretPosition(texta.getDocument().getLength());
-        scrollPane = new JScrollPane(texta);
+        JScrollPane scrollPane = new JScrollPane(texta);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(675, 300));
         scrollPane.setLocation(0, 0);
@@ -104,13 +102,13 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
         message = new JTextPane();
         //message.setLineWrap(true);
         //message.setWrapStyleWord(true);
-        scrollMessage= new JScrollPane(message);
+        JScrollPane scrollMessage= new JScrollPane(message);
         scrollMessage.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollMessage.setPreferredSize(new Dimension(500, 100));
         scrollMessage.setLocation(0, 320);
         add(scrollMessage);
         
-        send = new JButton("Send");
+        JButton send = new JButton("Send");
         send.addActionListener(this);
         send.setPreferredSize(new Dimension(170, 100));
         add(send);
@@ -130,7 +128,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     	   };
 
     	   public void actionPerformed(ActionEvent e){
-               if(e.getSource().equals(send)){
+               if(e.getSource() == send && (!message.getText().isEmpty())){
             	   sendMessage(message.getText());
                }
                if(e.getSource() == attach){

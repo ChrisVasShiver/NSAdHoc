@@ -221,7 +221,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
     		connections.sendMessage(text);
     	} catch(Exception e) {
     		System.out.println("There are no other clients connected");
-    	}	
+    	}
     	
     }
 	/*
