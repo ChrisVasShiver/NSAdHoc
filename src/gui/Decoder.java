@@ -10,7 +10,6 @@ public class Decoder {
 	
 	public Decoder(String file){
 		filename=file;
-		decode();
 	}
 	
 	public byte[] decode(){

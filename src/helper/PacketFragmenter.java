@@ -7,20 +7,29 @@ import main.Client;
 
 public class PacketFragmenter {
 
-	public static List<Packet> getPackets(Packet packet) {
+	public static List<Packet> getPackets(Packet header, byte[] data) {
 		List<Packet> packets = new ArrayList<Packet>();
-		if(packet.getBytes().length > Client.MAX_PACKET_SIZE) {
-			int nrOfPackets = (int)Math.ceil(packet.getDataL() / (double)(Client.MAX_PACKET_SIZE - Packet.BASICL));
-			String allData = packet.getData();
+		int maxDataSize = Client.MAX_PACKET_SIZE - Packet.HEADER_SIZE;
+		if(data.length > maxDataSize) {
+			int nrOfPackets = (int)Math.ceil(data.length / (double)maxDataSize);
 			for(int i = 0; i < nrOfPackets; i++) {
-				Packet p = packet.copyHeader();
-				p.setFragmentNr(i);
-				p.setData(null);
+				Packet packet = header.copyHeader();
+				packet.setFragmentNr(i);
+				if(i == nrOfPackets - 1)
+					maxDataSize = data.length % maxDataSize;
+				packet.setOffset(i * maxDataSize);
+				byte[] packetData = new byte[maxDataSize];
+				System.arraycopy(data, i * maxDataSize, packetData, 0, maxDataSize);
+				packet.setData(Packet.dataToString(packetData));
+				packets.add(packet);
 			}
 		}
-		else
+		else {
+			Packet packet = header.copyHeader();
 			packets.add(packet);
+		}
 		return packets;
 	}
+	
 
 }

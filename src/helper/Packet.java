@@ -12,7 +12,8 @@ public class Packet {
 	public final static byte FIN = 0x04; // Finish
 	public final static byte GRP = 0x08; // Group
 	public final static byte FRG = 0x10; // Fragmented
-	public final static int BASICL = 38;
+	public final static int HEADER_SIZE = 38;
+	public final static String ENCODING = "UTF-16BE";
 	private final static int BASICTTL = 12;
 	private InetAddress src;
 	private InetAddress dest;
@@ -26,6 +27,18 @@ public class Packet {
 	private int dataL;
 	private String data;
 		
+	/**
+	 * 
+	 * @param src
+	 * @param dest
+	 * @param seqNr
+	 * @param ackNr
+	 * @param flag
+	 * @param timeStamp
+	 * @param fragmentNr
+	 * @param offset
+	 * @param data
+	 */
 	public Packet(InetAddress src, InetAddress dest, int seqNr, int ackNr, byte flag, long timeStamp, 
 			int fragmentNr, int offset, String data) {
 		this.src = src;
@@ -37,10 +50,10 @@ public class Packet {
 		this.TTL = BASICTTL;
 		this.fragmentNr = fragmentNr;
 		this.offset = offset;
-		this.dataL = 0;
-		try {
-		this.dataL = data.getBytes("UTF-16BE").length;
-		} catch (Exception e) {}
+		if(data == null)
+			this.dataL = 0;
+		else
+			this.dataL = dataToByteArray(data).length;
 		this.data = data;
 	}
 	
@@ -72,21 +85,13 @@ public class Packet {
 		System.arraycopy(raw, 34, dataL, 0, 4);
 		this.dataL = Helper.byteArrayToInteger(dataL);
 		byte[] data = new byte[this.dataL];
-		if(this.dataL > (Client.MAX_PACKET_SIZE - BASICL))
-			this.dataL = (Client.MAX_PACKET_SIZE - BASICL); // TODO: split packets
 		System.arraycopy(raw, 38, data, 0, this.dataL);
-		try {
-			this.data = new String(data, "UTF-16BE");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.out.println("Hier kom ik niet als ik de string goed heb getypt!");
-		}		
+		this.data = dataToString(data);
 	}
 	
 	
 	public byte[] getBytes() {
-		byte[] result = new byte[BASICL + dataL];
+		byte[] result = new byte[HEADER_SIZE + dataL];
 		System.arraycopy(src.getAddress(),  0, result, 0, 4);
 		System.arraycopy(dest.getAddress(), 0, result, 4, 4);
 		System.arraycopy(Helper.integerToByteArray(seqNr), 0, result, 8, 4);
@@ -97,10 +102,8 @@ public class Packet {
 		System.arraycopy(Helper.integerToByteArray(fragmentNr), 0, result, 26, 4);
 		System.arraycopy(Helper.integerToByteArray(offset), 0, result, 30, 4);
 		System.arraycopy(Helper.integerToByteArray(dataL), 0, result, 34, 4);
-		if(data != null) {
-		try {
-			System.arraycopy(data.getBytes("UTF-16BE"), 0, result, 38, dataL);
-		} catch (UnsupportedEncodingException e) {}}
+		if(data != null)
+			System.arraycopy(dataToByteArray(data), 0, result, 38, dataL);
 		return result;
 	}
 	
@@ -108,6 +111,20 @@ public class Packet {
 		Packet result = new Packet(this.src, this.dest, this.seqNr, this.ackNr, this.flag, this.timeStamp,
 				this.fragmentNr, this.offset, null);
 		result.setTTL(this.TTL);
+		return result;
+	}
+	
+	public static String dataToString(byte[] data) {
+		String result = null;
+		try { result = new String(data, ENCODING);
+		} catch (UnsupportedEncodingException e) {e.printStackTrace();}
+		return result;
+	}
+	
+	public static byte[] dataToByteArray(String data) {
+		byte[] result = null;
+		try { result = data.getBytes(ENCODING);
+		} catch (UnsupportedEncodingException e) {e.printStackTrace();}
 		return result;
 	}
 	
@@ -189,10 +206,7 @@ public class Packet {
 	}
 
 	public void setData(String data) {
-		this.dataL = 0;
-		try {
-		this.dataL = data.getBytes("UTF-16BE").length;
-		} catch (Exception e) {}
+		this.dataL = dataToByteArray(ENCODING).length;
 		this.data = data;
 	}
 
@@ -212,6 +226,10 @@ public class Packet {
 		this.offset = offset;
 	}
 	
+	@Override
+	public String toString() {
+		return "Packet: " + getData();
+	}
 
 
 }
