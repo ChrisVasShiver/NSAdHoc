@@ -43,6 +43,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	private HashMap<InetAddress, PrivateGUI> pGUIs;
 	private JFileChooser fc;
 	private JFrame frame;
+	private boolean getNotification = false;
 	//private MouseListener userSelector;
 	//private JPane test;
 	FileFilter docFilter = new FileTypeFilter(".docx", "Microsoft Word Documents");
@@ -173,7 +174,8 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     	AudioPlayer a = new AudioPlayer();
     	a.start();
     	a.playSound("newmsg.wav");
-    	flickicon();
+    	if (getNotification)
+    		flickicon();
     	texta.setText(oldText + text + System.lineSeparator());
     	try {
 			a.join();
@@ -200,13 +202,13 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 
 	@Override
 	public void windowActivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
+		getNotification = false;		
 		
 	}
 
 	@Override
 	public void windowClosed(WindowEvent arg0) {
-		
+		getNotification = false;		
 		
 	}
 
@@ -218,25 +220,26 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 
 	@Override
 	public void windowDeactivated(WindowEvent arg0) {
+		getNotification = true;
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		getNotification = false;		
 	}
 
 	@Override
 	public void windowIconified(WindowEvent arg0) {
+		getNotification = true;
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void windowOpened(WindowEvent arg0) {
-		// TODO Auto-generated method stub
+		getNotification = false;		
 		
 	}
 }
