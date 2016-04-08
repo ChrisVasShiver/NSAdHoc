@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.Color;
+import java.io.File;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -11,6 +12,7 @@ import java.util.Observer;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
@@ -92,6 +94,12 @@ public class Client implements Observer {
 	     frame.setContentPane(gui);
 	     frame.setSize(700, 500);
 	     frame.setVisible(true);
+	     try {
+			frame.setIconImage(ImageIO.read(new File("msn.png")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void startThreads() {

@@ -63,7 +63,7 @@ public class Connection implements Observer {
 	public void sendMessage(String message) {
 		for(int i = 0; i < other.length; i++) {
 		Packet packet = new Packet(client.getLocalAddress(), other[i], lastSeqnr, 0, (byte) 0, System.currentTimeMillis(),
-				message);
+				0,0, message);
 		sendPacket(packet);
 		}
 	}
@@ -71,7 +71,7 @@ public class Connection implements Observer {
 	public void sendSYN() {
 		for (int i = 0; i < other.length; i++) {
 			Packet packet = new Packet(client.getLocalAddress(), other[i], lastSeqnr, 0, Packet.SYN,
-					System.currentTimeMillis(), null);
+					System.currentTimeMillis(), 0,0, null);
 			// TODO send public key
 			sendPacket(packet);
 		}
@@ -81,7 +81,7 @@ public class Connection implements Observer {
 	public void sendFIN() {
 		for(int i = 0; i < other.length; i++) {
 		Packet packet = new Packet(client.getLocalAddress(), other[i], lastSeqnr, 0, Packet.FIN,
-				System.currentTimeMillis(), null);
+				System.currentTimeMillis(),0,0, null);
 		sendPacket(packet);
 		}
 	}
