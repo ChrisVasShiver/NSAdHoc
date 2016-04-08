@@ -102,6 +102,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
         add(scrollPane);
         
         message = new JTextPane();
+        message.addKeyListener(sendText);
         //message.setLineWrap(true);
         //message.setWrapStyleWord(true);
         scrollMessage= new JScrollPane(message);
@@ -109,6 +110,8 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
         scrollMessage.setPreferredSize(new Dimension(500, 100));
         scrollMessage.setLocation(0, 320);
         add(scrollMessage);
+        
+        
         
         send = new JButton("Send");
         send.addActionListener(this);
