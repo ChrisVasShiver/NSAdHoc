@@ -184,13 +184,12 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     }
     
     public void flickicon(){
-    	int counter = 20;
-    	if(counter > 0){
+    	for(int counter =20; counter> 0; counter--){
     	try {
 			frame.setIconImage(ImageIO.read(new File("msn_black.png")));
 			this.wait(500);
 			frame.setIconImage(ImageIO.read(new File("msn.png")));
-			counter--;
+			this.wait(500);
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
