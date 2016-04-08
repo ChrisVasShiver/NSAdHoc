@@ -17,12 +17,23 @@ public class Connection implements Observer {
 
 	private TimerThread timerRunnable;
 	private Thread timerThread;
-	public final InetAddress other;
+	public final InetAddress[] other;
 	private Client client;
 	private int lastSeqnr = 1;
 	private int lastAcknr = 1;
 
 	public Connection(Client client, InetAddress other) {
+		this.other = new InetAddress[]{other};
+		this.client = client;
+		timerRunnable = new TimerThread();
+		timerThread = new Thread(timerRunnable);
+		timerThread.start();
+		timerRunnable.addObserver(this);
+		client.ulRunnable.addObserver(this);
+		sendSYN();
+	}
+	
+	public Connection(Client client, InetAddress[] other) {
 		this.other = other;
 		this.client = client;
 		timerRunnable = new TimerThread();
@@ -46,28 +57,36 @@ public class Connection implements Observer {
 	}
 
 	public void sendMessage(String message) {
-		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, (byte) 0, System.currentTimeMillis(),
+		for(int i = 0; i < other.length; i++) {
+		Packet packet = new Packet(client.getLocalAddress(), other[i], lastSeqnr, 0, (byte) 0, System.currentTimeMillis(),
 				message);
 		sendPacket(packet);
+		}
 	}
 
 	public void sendSYN() {
-		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.SYN,
-				System.currentTimeMillis(), null);
-		// TODO send public key
-		sendPacket(packet);
+		for (int i = 0; i < other.length; i++) {
+			Packet packet = new Packet(client.getLocalAddress(), other[i], lastSeqnr, 0, Packet.SYN,
+					System.currentTimeMillis(), null);
+			// TODO send public key
+			sendPacket(packet);
+		}
+
 	}
 
 	public void sendFIN() {
-		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.FIN,
+		for(int i = 0; i < other.length; i++) {
+		Packet packet = new Packet(client.getLocalAddress(), other[i], lastSeqnr, 0, Packet.FIN,
 				System.currentTimeMillis(), null);
 		sendPacket(packet);
+		}
 	}
 
 	public void sendPacket(Packet packet) {
-		DistanceVectorEntry dve = client.routingTable.get(other);
+		for(int i = 0; i < other.length; i++) {
+		DistanceVectorEntry dve = client.routingTable.get(other[i]);
 		if (dve == null) {
-			System.out.println("Address " + other.getHostName() + " is not in your routing table.");
+			System.out.println("Address " + other[i].getHostName() + " is not in your routing table.");
 			return;
 		}
 		DatagramPacket dpack = new DatagramPacket(packet.getBytes(), packet.getBytes().length, dve.nextHop,
@@ -81,6 +100,7 @@ public class Connection implements Observer {
 
 		timerRunnable.put(lastSeqnr, packet);
 		lastSeqnr++;
+		}
 	}
 
 	public void receiveMessage(Packet packet) {
