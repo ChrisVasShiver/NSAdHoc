@@ -116,13 +116,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 
     	   public void actionPerformed(ActionEvent e){
                if(e.getSource() == send && (!message.getText().isEmpty())){
-                   String text = message.getText();
-                   String showntext = texta.getText();
-                   //texta.append(text + System.lineSeparator());
-                   texta.setText(showntext + text + System.lineSeparator());
-                   message.setText(null);
-                   // TODO Auto-generated method stub
-                   //Hier kan verzendmethode komen
+            	   sendMessage(message.getText());
                }
                if(e.getSource() == attach){
                	System.out.println("attach");
