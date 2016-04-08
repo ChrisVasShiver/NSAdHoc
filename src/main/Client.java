@@ -127,8 +127,10 @@ public class Client implements Observer {
 			
 	public void stopPrivateGUI(InetAddress address) {
 		PrivateGUI pGUI = gui.pGUIs.get(address);
-		if (pGUI != null)
-			pGUI.texta.append(address.getHostName() + " closed the connection" + System.lineSeparator());
+		if (pGUI != null){
+			String oldText = pGUI.texta.getText();
+			pGUI.texta.setText(oldText + address.getHostName() + " closed the connection" + System.lineSeparator());
+		}
 	}
 
 	public void messageReceived(InetAddress source, String message) {
