@@ -147,7 +147,6 @@ public class Client implements Observer {
 		}
 	}
 	
-	@Override
 	public void update(Observable arg0, Object arg1) {
 		gui.userList.removeAllElements();
 		for(InetAddress address : routingTable.keySet()) {
