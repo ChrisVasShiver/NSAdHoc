@@ -1,6 +1,5 @@
 package gui;
 
-//Github
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -48,22 +47,19 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	JFrame frame;
 	private FlickIcon flickicon;
 	private boolean getNotification = false;
-	// private MouseListener userSelector;
-	// private JPane test;
+	
 	FileFilter docFilter = new FileTypeFilter(".docx", "Microsoft Word Documents");
 	FileFilter pdfFilter = new FileTypeFilter(".pdf", "PDF Documents");
 	FileFilter xlsFilter = new FileTypeFilter(".xlsx", "Microsoft Excel Documents");
 	FileFilter jpgFilter = new FileTypeFilter(".jpg", "JPG Image");
 
-	public PrivateGUI(Client client, InetAddress me, InetAddress other, SingleConnection conn,
+	public PrivateGUI(Client client, InetAddress me, SingleConnection conn,
 			HashMap<InetAddress, PrivateGUI> pGUIs) {
 		flickicon = new FlickIcon(this);
 		this.client = client;
-		this.other = other;
 		this.conn = conn;
 		this.pGUIs = pGUIs;
 		frame = new JFrame(other.toString());
-		// frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.addWindowListener(this);
 		this.setBackground(Color.WHITE);
 		frame.setContentPane(this);
@@ -79,22 +75,10 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	}
 
 	public void buildGUI() {
-		setLayout(new FlowLayout()); // Always set the layout before you add
-										// components
+		setLayout(new FlowLayout()); 
 
-		// you can use null layout, but you have to use setBounds() method
-		// for placing the components. For an advanced layout see the
-		// tutorials for GridBagLayout and mixing layouts with each other.
-
-		texta = new JTextPane(); // Do not mix AWT component with
-									// Swing (J components. See the packages)
-		// textf.setSize(40, 40); // Use setPreferredSize instead
-		// texta.setLineWrap(true);
-		// texta.setWrapStyleWord(true);
-
-		texta.setEditable(false); // Text fields are for getting data from user
-									// If you need to show something to user
-									// use JLabel instead.
+		texta = new JTextPane(); 
+		texta.setEditable(false);
 		texta.setBackground(Color.WHITE);
 		texta.setForeground(Color.BLACK);
 		texta.setCaretPosition(texta.getDocument().getLength());
@@ -111,8 +95,6 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		message.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0, false), "sendText");
 		message.getActionMap().put("sendText", new sendText());
 		
-		// message.setLineWrap(true);
-		// message.setWrapStyleWord(true);
 		scrollMessage = new JScrollPane(message);
 		scrollMessage.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollMessage.setPreferredSize(new Dimension(500, 100));
@@ -122,7 +104,6 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		send = new JButton("Send");
 		send.addActionListener(this);
 		send.setPreferredSize(new Dimension(170, 100));
-
 		add(send);
 
 		attach = new JButton("attach");
@@ -130,37 +111,18 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		add(attach);
 	}
 	
-	@SuppressWarnings("serial")
-	public class shiftEnter extends AbstractAction{
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			System.out.println("hij komt hier1");
-			String tempTXT = message.getText();
-			tempTXT = tempTXT + System.lineSeparator();
-			message.setText(tempTXT);
-		}
-	};
-	
-	@SuppressWarnings("serial")
-	public class sendText extends AbstractAction {
-		public void actionPerformed(ActionEvent e) {
-			System.out.println("hij komt hier2");
-				send.doClick();	
-		}
-	};
+
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == send && (!message.getText().isEmpty())) {
 			sendMessage(message.getText());
 		}
-		if (e.getSource() == attach) {
-			System.out.println("attach");
+		if (e.getSource() == attach) {			
 			JFrame fileChooser = new JFrame();
 			fileChooser.setSize(700, 500);
 			fc = new JFileChooser();
 			fileChooser.add(fc);
 			fileChooser.setVisible(true);
-
 			fc.addChoosableFileFilter(docFilter);
 			fc.addChoosableFileFilter(pdfFilter);
 			fc.addChoosableFileFilter(xlsFilter);
@@ -214,26 +176,16 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		texta.setCaretPosition(texta.getDocument().getLength());
 	}
 
-	/*
-	 * public void flickicon(){ for(int counter =20; counter> 0; counter--){ try
-	 * { frame.setIconImage(ImageIO.read(new File("msn_black.png")));
-	 * flick.wait(500); frame.setIconImage(ImageIO.read(new File("msn.png")));
-	 * flick.wait(500); } catch (IOException | InterruptedException e) { // TODO
-	 * Auto-generated catch block e.printStackTrace(); } }
-	 * 
-	 * }
-	 */
-
 	@Override
 	public void windowActivated(WindowEvent arg0) {
 		getNotification = false;
-
+		// TODO Auto-generated catch block
 	}
 
 	@Override
 	public void windowClosed(WindowEvent arg0) {
 		getNotification = false;
-
+		// TODO Auto-generated catch block
 	}
 
 	@Override
@@ -252,6 +204,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	@Override
 	public void windowDeiconified(WindowEvent arg0) {
 		getNotification = false;
+		// TODO Auto-generated catch block
 	}
 
 	@Override
@@ -264,6 +217,24 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	@Override
 	public void windowOpened(WindowEvent arg0) {
 		getNotification = false;
-
+		// TODO Auto-generated catch block
 	}
+	
+	@SuppressWarnings("serial")
+	public class shiftEnter extends AbstractAction{
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			String tempTXT = message.getText();
+			tempTXT = tempTXT + System.lineSeparator();
+			message.setText(tempTXT);
+		}
+	};
+	
+	@SuppressWarnings("serial")
+	public class sendText extends AbstractAction {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+				send.doClick();	
+		}
+	};
 }
