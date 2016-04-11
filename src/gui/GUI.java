@@ -192,15 +192,17 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 			@SuppressWarnings("unchecked")
 			JList<InetAddress> users = (JList<InetAddress>) mouseEvent.getSource();
 			if (mouseEvent.getClickCount() == 2) {
-				privateGUI((InetAddress) users.getSelectedValue());
+				privateGUI((InetAddress) users.getSelectedValue(), true);
 			}
 		}
 	};
 
-	public void privateGUI(InetAddress other) {
+	public void privateGUI(InetAddress other, boolean initiated) {
 		System.out.println("Starting new window");
 		if (pGUIs.get(other) == null) {
 			SingleConnection conn = new SingleConnection(client, other, false);
+			if(initiated)
+				conn.sendSYN();
 			PrivateGUI pGUI = new PrivateGUI(client, client.getLocalAddress(), other, conn, pGUIs);
 			pGUIs.put(other, pGUI);
 		} else {

@@ -143,7 +143,7 @@ public class Client implements Observer {
 
 	public void startPrivateGUI(InetAddress address) {
 		System.out.println("Client new window");
-		gui.privateGUI(address);
+		gui.privateGUI(address, false);
 	}
 			
 	public void stopPrivateGUI(InetAddress address) {
@@ -165,10 +165,10 @@ public class Client implements Observer {
 	public void update(Observable arg0, Object arg1) {
 		gui.userList.removeAllElements();
 		for(InetAddress address : routingTable.keySet()) {
-			if(!address.equals(getLocalAddress())) {
+//			if(!address.equals(getLocalAddress())) {
 				gui.userList.addElement(address);
 				gui.setGroupConnections();
-			}
+//			}
 	     }
 		
 	}

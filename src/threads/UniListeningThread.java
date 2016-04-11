@@ -43,8 +43,11 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 			return;
 
 		if(packet.getDest().equals(client.getLocalAddress())) {
-			if(packet.getFlag() == (Packet.SYN + Packet.ACK))
+			if(packet.getFlag() == Packet.SYN) {
+				System.out.println("SYN received");
 				client.startPrivateGUI(packet.getDest());
+				
+			}
 			setChanged();
 			notifyObservers(packet);
 			clearChanged();

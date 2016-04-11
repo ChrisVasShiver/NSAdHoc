@@ -48,7 +48,6 @@ public class SingleConnection implements Observer {
 		timerRunnable.addObserver(this);
 		client.ulRunnable.addObserver(this);
 		hybridEnc = new HybridEncryption();
-		sendSYN();
 	}
 
 	public void stop() {
@@ -87,17 +86,24 @@ public class SingleConnection implements Observer {
 	}
 
 	public void sendSYN() {
+		System.out.println("Sending SYN");
 		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.SYN,
 				System.currentTimeMillis(), 0, 0, null);
 		byte[] publicKey = hybridEnc.getPublicKey();
+
+		System.out.println("Public Key generated: " + Packet.dataToString(publicKey));
 		packet.setData(Packet.dataToString(publicKey));
 		addPacket(packet);
+		System.out.println("Sent SYN");
 	}
 
 	public void sendSYNACK(byte[] publicKey) {
+		System.out.println("SYN ACK received");
 		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.SYN,
 				System.currentTimeMillis(), 0, 0, null);
+		System.out.println("Public Key received: " + Packet.dataToString(publicKey));
 		byte[] secretKey = hybridEnc.generateEncryptedKey(publicKey);
+		System.out.println("SecretKey generated");
 		packet.setData(Packet.dataToString(secretKey));
 		addPacket(packet);
 	}
