@@ -1,39 +1,34 @@
 package network;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
-import helper.Packet;
-import helper.PacketFragmenter;
 import main.Client;
 
-public class MultiConnection extends SingleConnection {
+public class MultiConnection {
 
-	public static final InetAddress DUMMY = getGroup();
 
+	private List<SingleConnection> connections = new ArrayList<SingleConnection>();
+	private Client client;
+	
 	public MultiConnection(Client client) {
-		super(client, DUMMY);
+		this.client = client;
+		setConnections();
 	}
 
-	private static InetAddress getGroup() {
-		InetAddress result = null;
-		try {
-			result = InetAddress.getByAddress(new byte[] { (byte) 228, 0, 0, 0 });
-		} catch (UnknownHostException e) {
+
+	public void setConnections() {
+		connections.clear();
+		for(InetAddress address : client.routingTable.keySet()) {
+			if(!client.getLocalAddress().equals(address))
+				connections.add(new SingleConnection(this.client, address, true));
 		}
-		return result;
 	}
 	
-	@Override
 	public void sendMessage(String message) {
-		for(InetAddress other : client.routingTable.keySet()) {
-			Packet header = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.GRP, System.currentTimeMillis(),
-					0,0, null);
-			List<Packet> packets = PacketFragmenter.getPackets(header, Packet.dataToByteArray(message));
-			addPackets(packets);
+		for(SingleConnection conn : connections) {
+			conn.sendMessage(message);
 		}
-		
-}
-
+	}
 }
