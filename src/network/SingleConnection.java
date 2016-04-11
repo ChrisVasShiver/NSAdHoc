@@ -141,6 +141,7 @@ public class SingleConnection implements Observer {
 	public void receiveMessage(Packet packet) {
 		switch (packet.getFlag()) {
 		case Packet.ACK + Packet.SYN:
+			System.out.println("SYN ACK received");
 			hybridEnc.decryptAndStoreKey(Packet.dataToByteArray(packet.getData()));
 			// No break; (INTENTIONAL!)
 		case Packet.ACK:
