@@ -7,13 +7,13 @@ import main.Client;
 
 public class PacketFragmenter {
 
-	public static List<Packet> getPackets(Packet originalPacket, byte[] data) {
+	public static List<Packet> getPackets(Packet header, byte[] data) {
 		List<Packet> packets = new ArrayList<Packet>();
 		int maxDataSize = Client.MAX_PACKET_SIZE - Packet.HEADER_SIZE;
 		if(data.length > maxDataSize) {
 			int nrOfPackets = (int)Math.ceil(data.length / (double)maxDataSize);
 			for(int i = 0; i < nrOfPackets; i++) {
-				Packet packet = originalPacket.copyHeader();
+				Packet packet = header.copyHeader();
 				packet.setFragmentNr(i);
 				if(i == nrOfPackets - 1) {
 					maxDataSize = data.length % maxDataSize;
@@ -28,7 +28,9 @@ public class PacketFragmenter {
 			}
 		}
 		else {
-			packets.add(originalPacket);
+			Packet packet = header.copyHeader();
+			packet.setData(Packet.dataToString(data));
+			packets.add(packet);
 		}
 		return packets;
 	}
