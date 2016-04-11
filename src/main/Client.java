@@ -4,9 +4,11 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,11 +48,7 @@ public class Client implements Observer {
 	
 	public Client() {
 		this.gui = new GUI(this);
-		InetAddress localAddress = getLocalAddress();
 		routingTable.addObserver(this);
-		DistanceVectorEntry defaultEntry = new DistanceVectorEntry(localAddress, 0, localAddress);
-		if(localAddress != null)
-			routingTable.put(localAddress, defaultEntry);
 		try {
 			group = InetAddress.getByName("228.0.0.2");
 			multiSocket = new MulticastSocket(multiPort);
@@ -60,6 +58,10 @@ public class Client implements Observer {
 			//TODO
 			e.printStackTrace();
 		}
+		InetAddress localAddress = getLocalAddress();
+		DistanceVectorEntry defaultEntry = new DistanceVectorEntry(localAddress, 0, localAddress);
+		if(localAddress != null)
+			routingTable.put(localAddress, defaultEntry);
 	}
 	
 	public void start() {
@@ -74,13 +76,24 @@ public class Client implements Observer {
 		uniSocket.close();
 		System.out.println("Client closed");
 	}
+	
 	public InetAddress getLocalAddress() {
-		InetAddress result = null;
 		try {
-			result = InetAddress.getLocalHost();
-		} catch (UnknownHostException e) { e.printStackTrace();}
-		System.out.println(result);
-		return (result.isLoopbackAddress() ? null : result);
+			Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+			while(networkInterfaces.hasMoreElements()) {
+				NetworkInterface ni = (NetworkInterface) networkInterfaces.nextElement();
+				Enumeration<InetAddress> nias = ni.getInetAddresses();
+				while(nias.hasMoreElements()) {
+					InetAddress ia = (InetAddress) nias.nextElement();
+					if(!ia.isLinkLocalAddress() && !ia.isLoopbackAddress() && ia instanceof Inet4Address) {
+						return ia;
+					}
+				}
+			}
+		} catch(Exception e) {
+			
+		} 
+		return null;
 	}
 	public static void main(String[] args) {
 		Client client = new Client();

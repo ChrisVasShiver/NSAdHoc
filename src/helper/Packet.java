@@ -107,8 +107,9 @@ public class Packet implements Comparable<Packet> {
 		System.arraycopy(Helper.integerToByteArray(offset), 0, result, 30, 4);
 		System.arraycopy(Helper.integerToByteArray(packetNumber), 0, result, 34, 4);
 		System.arraycopy(Helper.integerToByteArray(dataL), 0, result, 38, 4);
-		if(data != null && dataL != 0)
-			System.arraycopy(dataToByteArray(data), 0, result, 42, dataL);
+		byte[] data = dataToByteArray(this.data);
+		if(data != null && dataL > 0)
+			System.arraycopy(data, 0, result, 42, dataL);
 		return result;
 	}
 	
@@ -134,6 +135,7 @@ public class Packet implements Comparable<Packet> {
 	}
 	
 	public static byte[] dataToByteArray(String data) {
+		if(data == null) { return null; }
 		byte[] result = null;
 		try { result = data.getBytes(ENCODING);
 		} catch (UnsupportedEncodingException e) {e.printStackTrace();}
