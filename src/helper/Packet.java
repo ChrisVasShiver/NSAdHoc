@@ -9,6 +9,7 @@ public class Packet implements Comparable<Packet> {
 	public class Flags {
 		public final static byte ACK = 0x01; // Acknowledgement
 		public final static byte SYN = 0x02; // Synchronize
+		public final static byte SYN_ACK = 0x03;
 		public final static byte FIN = 0x04; // Finish
 		public final static byte GRP = 0x08; // Group
 		public final static byte FRG = 0x10; // Fragmented
