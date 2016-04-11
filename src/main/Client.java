@@ -8,6 +8,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.Observable;
 import java.util.Observer;
@@ -90,9 +91,7 @@ public class Client implements Observer {
 					}
 				}
 			}
-		} catch(Exception e) {
-			
-		} 
+		} catch(SocketException e) {} 
 		return null;
 	}
 	public static void main(String[] args) {

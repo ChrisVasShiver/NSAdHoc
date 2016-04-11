@@ -11,6 +11,7 @@ public class PacketFragmenter {
 		List<Packet> packets = new ArrayList<Packet>();
 		int maxDataSize = Client.MAX_PACKET_SIZE - Packet.HEADER_SIZE;
 		if(data.length > maxDataSize) {
+			System.out.println("Big packet");
 			int nrOfPackets = (int)Math.ceil(data.length / (double)maxDataSize);
 			for(int i = 0; i < nrOfPackets; i++) {
 				Packet packet = header.copyHeader();

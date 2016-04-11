@@ -26,6 +26,7 @@ public class SingleConnection implements Observer {
 	protected Client client;
 	protected int lastSeqnr = 1;
 	protected int lastAcknr = 1;
+	protected int lastSeqnrReceived = 0;
 	protected int lastPacketID = 1;
 	protected final int SWS = 10;
 	protected final int RWS = 10;
@@ -122,6 +123,7 @@ public class SingleConnection implements Observer {
 	}
 	
 	public void receiveMessage(Packet packet) {
+		lastSeqnrReceived = packet.getSeqNr();
 		switch (packet.getFlag()) {
 		case Packet.ACK + Packet.SYN:
 			// TODO
