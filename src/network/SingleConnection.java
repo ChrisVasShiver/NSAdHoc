@@ -95,7 +95,7 @@ public class SingleConnection implements Observer {
 	}
 
 	public void sendSYNACK(byte[] publicKey) {
-		System.out.println("SYN ACK received");
+		System.out.println("SYN ACK sent");
 		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.SYN_ACK,
 				System.currentTimeMillis(), 0, 0, null);
 		System.out.println("Public Key received: " + Arrays.toString(publicKey));
