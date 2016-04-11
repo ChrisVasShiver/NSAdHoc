@@ -33,6 +33,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.filechooser.FileFilter;
 
 import main.Client;
+import network.MultiConnection;
 import network.SingleConnection;
 
 // Use upper Case in the start of you class names:
@@ -52,7 +53,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	public HashMap<InetAddress, PrivateGUI> pGUIs = new HashMap<InetAddress, PrivateGUI>();
 	private JFileChooser fc;
 	private Client client;
-	private SingleConnection connections;
+    private MultiConnection connections;
 	// private MouseListener userSelector;
 	// private JPane test;
 	
@@ -63,6 +64,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	
 	public GUI(Client client) {
 		this.client = client;
+		//this.connections = new MultiConnection(client); TODO
 		buildGUI();
 	}
 
@@ -208,7 +210,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		for(int i = 0; i < userList.size(); i ++) {
 			allUsers[i] = userList.getElementAt(i);
 		}
-		//connections = new Connection1(client, allUsers);
+		//connections = new Connection1(client, allUsers); TODO
 	}
 	
     public void sendMessage(String text) {
@@ -217,12 +219,8 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
     			+ new Date(System.currentTimeMillis()) + "):" 
     			+ System.lineSeparator() + " " + text + System.lineSeparator());
     	message.setText(null);
-    	try {
-    		connections.sendMessage(text);
-    	} catch(Exception e) {
-    		System.out.println("There are no other clients connected");
-    	}
     	
+//    	connections.sendMessage(text);  	
     }
 	/*
 	 * public void jListUsernameMouseClicked(java.awt.event.MouseEvent evt){

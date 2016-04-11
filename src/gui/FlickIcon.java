@@ -6,29 +6,30 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class FlickIcon extends Thread{
+public class FlickIcon extends Thread {
 	private PrivateGUI pGUI;
-	
-	public FlickIcon(PrivateGUI privateGUI){
-		pGUI=privateGUI;
+
+	public FlickIcon(PrivateGUI privateGUI) {
+		pGUI = privateGUI;
 	}
-	 public void flickIcon(){
-	    	for(int counter =20; counter> 0; counter--){
-	    	try {
+
+	public void flickIcon() {
+		for (int counter = 20; counter > 0; counter--) {
+			try {
 				pGUI.frame.setIconImage(ImageIO.read(new File("msn_black.png")));
-				this.wait(500);
+				Thread.sleep(200);
 				pGUI.frame.setIconImage(ImageIO.read(new File("msn.png")));
-				this.wait(500);
+				Thread.sleep(200);
 			} catch (IOException | InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	    	}
-	    	
-	    }
-	 
-	 public void run(){
-		 flickIcon();
-	 }
-	 
+		}
+
+	}
+
+	public void run() {
+		flickIcon();
+	}
+
 }

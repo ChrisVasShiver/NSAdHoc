@@ -20,18 +20,18 @@ import threads.UniListeningThread;
 
 public class SingleConnection implements Observer {
 
-	private TimerThread timerRunnable;
-	private Thread timerThread;
+	protected TimerThread timerRunnable;
+	protected Thread timerThread;
 	public final InetAddress other;
-	private Client client;
-	private int lastSeqnr = 1;
-	private int lastAcknr = 1;
-	private int lastPacketID = 1;
-	private final int SWS = 10;
-	private final int RWS = 10;
-	private List<Packet> queue = new ArrayList<Packet>();
-	private HashMap<Integer, List<Packet>> buffer = new HashMap<Integer, List<Packet>>();
-	private List<Packet> sentWindow = new ArrayList<Packet>();
+	protected Client client;
+	protected int lastSeqnr = 1;
+	protected int lastAcknr = 1;
+	protected int lastPacketID = 1;
+	protected final int SWS = 10;
+	protected final int RWS = 10;
+	protected List<Packet> queue = new ArrayList<Packet>();
+	protected HashMap<Integer, HashMap<Integer, Packet>> buffer = new HashMap<Integer, HashMap<Integer, Packet>>();
+	protected List<Packet> sentWindow = new ArrayList<Packet>();
 	
 	public SingleConnection(Client client, InetAddress other) {
 		this.other = other;
@@ -40,7 +40,7 @@ public class SingleConnection implements Observer {
 		timerThread = new Thread(timerRunnable);
 		timerThread.start();
 		timerRunnable.addObserver(this);
-		client.ulRunnable.addObserver(this);
+		//client.ulRunnable.addObserver(this);
 		sendSYN();
 	}
 
@@ -56,7 +56,7 @@ public class SingleConnection implements Observer {
 		sendFIN();
 	}
 
-	private void addPackets(List<Packet> packets) {
+	protected void addPackets(List<Packet> packets) {
 		for(Packet packet : packets) {
 			packet.setPacketID(lastPacketID);
 			addPacket(packet);
@@ -67,7 +67,7 @@ public class SingleConnection implements Observer {
 	private void addPacket(Packet packet) {
 		queue.add(packet);
 		if(sentWindow.size() <= SWS)
-			transmitPacket(queue.remove(1));
+			transmitPacket(queue.remove(0));
 	}
 	
 	public void sendMessage(String message) {
@@ -133,8 +133,8 @@ public class SingleConnection implements Observer {
 				Packet acked = sentWindow.get(i);
 				if(acked.getSeqNr() == packet.getAckNr()) {
 					sentWindow.remove(i);
-					if(sentWindow.size() <= SWS)
-						transmitPacket(queue.remove(1));
+					if(sentWindow.size() <= SWS && queue.size() > 0)
+						transmitPacket(queue.remove(0));
 				}
 			}
 			break;
@@ -150,13 +150,13 @@ public class SingleConnection implements Observer {
 			break;
 		case Packet.FRG:
 		case Packet.LST:
-			List<Packet> packets = buffer.get(packet.getPacketID());
+			HashMap<Integer, Packet> packets = buffer.get(packet.getPacketID());
 			if(packets == null) {
-				packets = new ArrayList<Packet>();
-				packets.add(packet);
+				packets = new HashMap<Integer, Packet>();
+				packets.put(packet.getFragmentNr(), packet);
 				buffer.put(packet.getPacketID(), packets);	
 			} else {
-				packets.add(packet);
+				packets.put(packet.getFragmentNr(), packet);
 			}
 			if(checkBuffer(packet.getPacketID()))
 				flushBuffer(packet.getPacketID());
@@ -173,18 +173,19 @@ public class SingleConnection implements Observer {
 	}
 
 	private boolean checkBuffer(Integer ID) {
-		List<Packet> packets = buffer.get(ID);
-		Collections.sort(packets);
+		HashMap<Integer, Packet> packets = buffer.get(ID);
 		for(int i = 0; i < packets.size(); i++) {
-			if(packets.get(i).getFragmentNr() != i)
+			if(packets.get(i) == null)
 				return false;
 		}
-		return (packets.get(packets.size() - 1).getFlag() == Packet.LST);
+		Packet last = packets.get(packets.size() - 1);
+		return last != null && last.getFlag() == Packet.LST;
 	}
 	
 	private void flushBuffer(Integer ID) {
 		ArrayList<Byte> rawMessage = new ArrayList<Byte>();
-		for(Packet packet : buffer.get(ID))
+		HashMap<Integer, Packet> packetList = buffer.get(ID);
+		for(Packet packet : packetList.values())
 			for(byte b : packet.getBytes())
 				rawMessage.add(b);
 		Packet header = buffer.get(ID).get(0);

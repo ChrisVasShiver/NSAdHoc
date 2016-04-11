@@ -181,11 +181,13 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     	AudioPlayer a = new AudioPlayer();
     	a.start();
     	a.playSound("newmsg.wav");
+    	this.requestFocus();
     	if (getNotification)
-    		flickicon.run();
+    		flickicon.start();
     	texta.setText(oldText + text + System.lineSeparator());
     	try {
 			a.join();
+			flickicon.join();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

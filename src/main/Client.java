@@ -36,7 +36,7 @@ public class Client implements Observer {
 	private MultiListeningThread mlRunnable;
 	public UniListeningThread ulRunnable;
 	
-	private GUI gui = new GUI(this);
+	private GUI gui;
 	
 	public MulticastSocket multiSocket;
 	public InetAddress group;
@@ -47,6 +47,7 @@ public class Client implements Observer {
 	public static final int MAX_PACKET_SIZE = 1024;
 	
 	public Client() {
+		this.gui = new GUI(this);
 		InetAddress localAddress = getLocalAddress();
 		routingTable.addObserver(this);
 		DistanceVectorEntry defaultEntry = new DistanceVectorEntry(localAddress, 0, localAddress);
@@ -152,10 +153,10 @@ public class Client implements Observer {
 	public void update(Observable arg0, Object arg1) {
 		gui.userList.removeAllElements();
 		for(InetAddress address : routingTable.keySet()) {
-			if(!address.equals(getLocalAddress())) {
+			//if(!address.equals(getLocalAddress())) {
 				gui.userList.addElement(address);
 				gui.setGroupConnetions();
-			}
+			//}
 	     }
 		
 	}
