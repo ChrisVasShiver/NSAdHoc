@@ -90,6 +90,7 @@ public class SingleConnection implements Observer {
 				System.currentTimeMillis(), 0, 0, null);
 		byte[] publicKey = hybridEnc.getPublicKey();
 		packet.setData(publicKey);
+		System.out.println(Base64.encodeBase64String(packet.getData()));
 		addPacket(packet);
 		System.out.println("Sent SYN");
 	}
@@ -145,7 +146,7 @@ public class SingleConnection implements Observer {
 		case Packet.Flags.SYN_ACK:
 			System.out.println("SYN ACK received");
 			System.out.println(packet.getData());
-			hybridEnc.decryptAndStoreKey(Base64.decodeBase64(packet.getData()));
+			hybridEnc.decryptAndStoreKey(packet.getData());
 			// No break; (INTENTIONAL!)
 		case Packet.Flags.ACK:
 			timerRunnable.remove(packet.getAckNr());
@@ -160,7 +161,7 @@ public class SingleConnection implements Observer {
 			break;
 		case Packet.Flags.SYN:
 			if(!isGroup) {
-				sendSYNACK(Base64.decodeBase64(packet.getData()));
+				sendSYNACK(packet.getData());
 				client.startPrivateGUI(packet.getSrc());
 			}
 			sendACK(packet);

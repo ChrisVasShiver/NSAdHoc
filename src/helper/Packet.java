@@ -93,14 +93,14 @@ public class Packet implements Comparable<Packet> {
 		System.arraycopy(raw, 38, dataL, 0, 4);
 		this.dataL = Helper.byteArrayToInteger(dataL);
 		if(this.dataL > 0) {
-			byte[] data = new byte[this.dataL];
-			System.arraycopy(raw, 42, data, 0, this.dataL);
+			this.data = new byte[this.dataL];
+			System.arraycopy(raw, 42, this.data, 0, this.dataL);
 		}
 	}
 	
 	
 	public byte[] getBytes() {
-		byte[] result = new byte[HEADER_SIZE + data.length];
+		byte[] result = new byte[HEADER_SIZE + dataL];
 		System.arraycopy(src.getAddress(),  0, result, 0, 4);
 		System.arraycopy(dest.getAddress(), 0, result, 4, 4);
 		System.arraycopy(Helper.integerToByteArray(seqNr), 0, result, 8, 4);
@@ -112,7 +112,8 @@ public class Packet implements Comparable<Packet> {
 		System.arraycopy(Helper.integerToByteArray(offset), 0, result, 30, 4);
 		System.arraycopy(Helper.integerToByteArray(packetNumber), 0, result, 34, 4);
 		System.arraycopy(Helper.integerToByteArray(dataL),0, result, 38, 4);
-		System.arraycopy(data, 0, result, 42, data.length);
+		if(data != null)
+			System.arraycopy(data, 0, result, 42, dataL);
 		return result;
 	}
 	
