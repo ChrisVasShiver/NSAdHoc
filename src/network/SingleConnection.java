@@ -101,7 +101,7 @@ public class SingleConnection implements Observer {
 				System.currentTimeMillis(), 0, 0, null);
 		System.out.println("Public Key received: " + Arrays.toString(publicKey));
 		byte[] secretKey = hybridEnc.generateEncryptedKey(publicKey);
-		System.out.println("SecretKey generated");
+		System.out.println("SecretKey generated: " + Base64.encodeBase64String(secretKey));
 		packet.setData(secretKey);
 		addPacket(packet);
 	}
