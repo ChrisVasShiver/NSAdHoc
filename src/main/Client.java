@@ -172,4 +172,9 @@ public class Client implements Observer {
 	     }
 		
 	}
+
+	public void groupMessageReceived(String message) {
+		gui.setText(message);
+		
+	}
 }

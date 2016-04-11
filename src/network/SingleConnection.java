@@ -20,23 +20,25 @@ import threads.UniListeningThread;
 
 public class SingleConnection implements Observer {
 
-	protected TimerThread timerRunnable;
-	protected Thread timerThread;
+	private TimerThread timerRunnable;
+	private Thread timerThread;
 	public final InetAddress other;
-	protected Client client;
-	protected int lastSeqnr = 1;
-	protected int lastAcknr = 1;
-	protected int lastPacketID = 1;
-	protected int lastPacketReceived = 0;
-	protected final int SWS = 10;
-	protected final int RWS = 10;
-	protected List<Packet> queue = new ArrayList<Packet>();
-	protected HashMap<Integer, HashMap<Integer, Packet>> buffer = new HashMap<Integer, HashMap<Integer, Packet>>();
-	protected List<Packet> sentWindow = new ArrayList<Packet>();
+	private boolean isGroup;
+	private Client client;
+	private int lastSeqnr = 1;
+	private int lastAcknr = 1;
+	private int lastPacketID = 1;
+	private int lastPacketReceived = 0;
+	private final int SWS = 10;
+	private final int RWS = 10;
+	private List<Packet> queue = new ArrayList<Packet>();
+	private HashMap<Integer, HashMap<Integer, Packet>> buffer = new HashMap<Integer, HashMap<Integer, Packet>>();
+	private List<Packet> sentWindow = new ArrayList<Packet>();
 
-	public SingleConnection(Client client, InetAddress other) {
+	public SingleConnection(Client client, InetAddress other, boolean isGroup) {
 		this.other = other;
 		this.client = client;
+		this.isGroup = isGroup;
 		timerRunnable = new TimerThread();
 		timerThread = new Thread(timerRunnable);
 		timerThread.start();
@@ -72,7 +74,8 @@ public class SingleConnection implements Observer {
 	}
 
 	public void sendMessage(String message) {
-		Packet header = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, (byte) 0, System.currentTimeMillis(),
+		byte flag = isGroup ? Packet.GRP : (byte)0;
+		Packet header = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, flag, System.currentTimeMillis(),
 				0, 0, null);
 		List<Packet> packets = PacketFragmenter.getPackets(header, Packet.dataToByteArray(message));
 		addPackets(packets);
@@ -168,7 +171,10 @@ public class SingleConnection implements Observer {
 			if (lastPacketReceived != packet.getSeqNr()) {
 				String message = packet.getSrc().getHostName() + " (" + new Date(packet.getTimeStamp()) + "):"
 						+ System.lineSeparator() + " " + packet.getData();
-				client.messageReceived(packet.getSrc(), message);
+				if(isGroup) 
+					client.groupMessageReceived(message);
+				else
+					client.messageReceived(packet.getSrc(), message);
 				lastPacketReceived = packet.getSeqNr();
 			} 
 			sendACK(packet);

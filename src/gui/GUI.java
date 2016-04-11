@@ -32,6 +32,8 @@ import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.filechooser.FileFilter;
 
+import org.w3c.dom.Text;
+
 import main.Client;
 import network.MultiConnection;
 import network.SingleConnection;
@@ -64,7 +66,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	
 	public GUI(Client client) {
 		this.client = client;
-		//this.connections = new MultiConnection(client); TODO
+		this.connections = new MultiConnection(client); 
 		buildGUI();
 	}
 
@@ -198,7 +200,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	public void privateGUI(InetAddress other) {
 		System.out.println("Starting new window");
 		if (pGUIs.get(other) == null) {
-			SingleConnection conn = new SingleConnection(client, other);
+			SingleConnection conn = new SingleConnection(client, other, false);
 			PrivateGUI pGUI = new PrivateGUI(client, client.getLocalAddress(), other, conn, pGUIs);
 			pGUIs.put(other, pGUI);
 		} else {
@@ -221,8 +223,13 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
     			+ System.lineSeparator() + " " + text + System.lineSeparator());
     	message.setText(null);
     	
-//    	connections.sendMessage(text);  	
+    	connections.sendMessage(text);  	
     }
+    
+
+	public void setText(String message) {
+		this.texta.setText(texta.getText() + System.lineSeparator() + message);
+	}
 	/*
 	 * public void jListUsernameMouseClicked(java.awt.event.MouseEvent evt){
 	 * System.out.println("klik"); JList users = (JList)evt.getSource();
@@ -285,5 +292,6 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		// TODO Auto-generated method stub
 		
 	}
+
 
 }
