@@ -27,7 +27,6 @@ public class MultiConnection {
 	}
 	
 	public void sendMessage(String message) {
-		setConnections();
 		for(SingleConnection conn : connections) {
 			conn.sendMessage(message);
 		}

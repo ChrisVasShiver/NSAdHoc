@@ -208,12 +208,8 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		}
 	}
 	
-	public void setGroupConnetions() {
-		InetAddress[] allUsers =  new InetAddress[userList.size()];
-		for(int i = 0; i < userList.size(); i ++) {
-			allUsers[i] = userList.getElementAt(i);
-		}
-		//connections = new Connection1(client, allUsers); TODO
+	public void setGroupConnections() {
+		connections.setConnections();
 	}
 	
     public void sendMessage(String text) {

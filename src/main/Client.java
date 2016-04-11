@@ -167,7 +167,7 @@ public class Client implements Observer {
 		for(InetAddress address : routingTable.keySet()) {
 			if(!address.equals(getLocalAddress())) {
 				gui.userList.addElement(address);
-				gui.setGroupConnetions();
+				gui.setGroupConnections();
 			}
 	     }
 		
