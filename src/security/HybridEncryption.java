@@ -16,9 +16,9 @@ public class HybridEncryption {
 		 byte[] publicKey = hb.getPublicKey();
 		 byte[] key = hb.generateEncryptedKey(publicKey);
 		 hb.decryptAndStoreKey(key);	 
-		 byte[] m = hb.encryptMessage("Hello World".getBytes("ASCII"));
+		 byte[] m = hb.encryptMessage("Hoiallemaal".getBytes("UTF-16BE"));
 		 byte[] message = hb.decryptMessage(m);
-		 System.out.println(new String(message, "ASCII"));		 
+		 System.out.println(new String(message, "UTF-16BE"));		 
 	 }
 	
 	public Key secretKey;

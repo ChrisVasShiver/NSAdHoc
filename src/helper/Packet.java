@@ -5,6 +5,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import com.sun.org.apache.xml.internal.security.utils.Base64;
+
 public class Packet implements Comparable<Packet> {
 	public class Flags {
 		public final static byte ACK = 0x01; // Acknowledgement
@@ -94,7 +96,10 @@ public class Packet implements Comparable<Packet> {
 		this.dataL = Helper.byteArrayToInteger(dataL);
 		byte[] data = new byte[this.dataL];
 		System.arraycopy(raw, 42, data, 0, this.dataL);
-		this.data = dataToString(data);
+		if(this.flag != Packet.Flags.GRP && (this.flag == Packet.Flags.SYN_ACK || this.flag == Packet.Flags.SYN))
+			this.data = Base64.encode(data);
+		else
+			this.data = dataToString(data);
 	}
 	
 	
