@@ -40,7 +40,7 @@ public class SingleConnection implements Observer {
 		timerThread = new Thread(timerRunnable);
 		timerThread.start();
 		timerRunnable.addObserver(this);
-		//client.ulRunnable.addObserver(this);
+		client.ulRunnable.addObserver(this);
 		sendSYN();
 	}
 

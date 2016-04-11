@@ -9,7 +9,6 @@ import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.imageio.ImageIO;
@@ -27,7 +26,6 @@ import threads.UniListeningThread;
 public class Client implements Observer {
 	public RoutingTable routingTable = new RoutingTable();
 	public ConcurrentHashMap<InetAddress, Long> neighbourTimeout = new ConcurrentHashMap<InetAddress, Long>();
-	private Scanner in = new Scanner(System.in);
 	
 	private Thread dvThread;
 	private Thread mlThread;
@@ -81,6 +79,7 @@ public class Client implements Observer {
 		try {
 			result = InetAddress.getLocalHost();
 		} catch (UnknownHostException e) { e.printStackTrace();}
+		System.out.println(result);
 		return (result.isLoopbackAddress() ? null : result);
 	}
 	public static void main(String[] args) {
