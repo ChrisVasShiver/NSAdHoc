@@ -101,8 +101,4 @@ public class MultiListeningThread implements Runnable {
 				client.routingTable.remove(address);
 		client.routingTable.remove(node);
 	}
-	
-	/* TODO:
-	 * postpone good news after bad news
-	 */
 }

@@ -14,9 +14,7 @@ import helper.DistanceVectorEntry;
 import helper.Packet;
 import helper.PacketFragmenter;
 import main.Client;
-import security.AsymmetricEncryption;
 import security.HybridEncryption;
-import security.SymmetricEncryption;
 import threads.TimerThread;
 import threads.UniListeningThread;
 
@@ -28,11 +26,9 @@ public class SingleConnection implements Observer {
 	private boolean isGroup;
 	private Client client;
 	private int lastSeqnr = 1;
-	private int lastAcknr = 1;
 	private int lastPacketID = 1;
 	private int lastPacketReceived = 0;
 	private final int SWS = 10;
-	private final int RWS = 10;
 	private List<Packet> queue = new ArrayList<Packet>();
 	private HashMap<Integer, HashMap<Integer, Packet>> buffer = new HashMap<Integer, HashMap<Integer, Packet>>();
 	private List<Packet> sentWindow = new ArrayList<Packet>();
@@ -55,7 +51,7 @@ public class SingleConnection implements Observer {
 		try {
 			timerThread.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			//TODO remove stack trace
 			e.printStackTrace();
 		}
 		client.ulRunnable.deleteObserver(this);
@@ -78,7 +74,7 @@ public class SingleConnection implements Observer {
 
 	public void sendMessage(String message) {
 		byte[] encryptedMessage = hybridEnc.encryptMessage(Packet.dataToByteArray(message));
-		byte flag = isGroup ? Packet.GRP : (byte)0;
+		byte flag = isGroup ? Packet.Flags.GRP : (byte)0;
 		Packet header = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, flag, System.currentTimeMillis(),
 				0, 0, null);
 		List<Packet> packets = PacketFragmenter.getPackets(header, encryptedMessage);
@@ -87,7 +83,7 @@ public class SingleConnection implements Observer {
 
 	public void sendSYN() {
 		System.out.println("Sending SYN");
-		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.SYN,
+		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.SYN,
 				System.currentTimeMillis(), 0, 0, null);
 		byte[] publicKey = hybridEnc.getPublicKey();
 
@@ -99,7 +95,7 @@ public class SingleConnection implements Observer {
 
 	public void sendSYNACK(byte[] publicKey) {
 		System.out.println("SYN ACK received");
-		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.SYN,
+		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.SYN,
 				System.currentTimeMillis(), 0, 0, null);
 		System.out.println("Public Key received: " + Packet.dataToString(publicKey));
 		byte[] secretKey = hybridEnc.generateEncryptedKey(publicKey);
@@ -109,9 +105,8 @@ public class SingleConnection implements Observer {
 	}
 	
 	public void sendFIN() {
-		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.FIN,
+		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.FIN,
 				System.currentTimeMillis(), 0, 0, null);
-		// TODO sendPacket(packet);
 		addPacket(packet);
 	}
 
@@ -126,7 +121,7 @@ public class SingleConnection implements Observer {
 		try {
 			client.uniSocket.send(dpack);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			//TODO remove stack trace
 			e.printStackTrace();
 		}
 
@@ -146,13 +141,12 @@ public class SingleConnection implements Observer {
 
 	public void receiveMessage(Packet packet) {
 		switch (packet.getFlag()) {
-		case Packet.ACK + Packet.SYN:
+		case Packet.Flags.ACK + Packet.Flags.SYN:
 			System.out.println("SYN ACK received");
 			hybridEnc.decryptAndStoreKey(Packet.dataToByteArray(packet.getData()));
 			// No break; (INTENTIONAL!)
-		case Packet.ACK:
+		case Packet.Flags.ACK:
 			timerRunnable.remove(packet.getAckNr());
-			lastAcknr = packet.getAckNr();
 			for (int i = 0; i < sentWindow.size(); i++) {
 				Packet acked = sentWindow.get(i);
 				if (acked.getSeqNr() == packet.getAckNr()) {
@@ -162,22 +156,20 @@ public class SingleConnection implements Observer {
 				}
 			}
 			break;
-		case Packet.SYN:
+		case Packet.Flags.SYN:
 			if(!isGroup) {
 				sendSYNACK(Packet.dataToByteArray(packet.getData()));
 				client.startPrivateGUI(packet.getSrc());
 			}
 			sendACK(packet);
-			// TODO
 			break;
-		case Packet.FIN:
+		case Packet.Flags.FIN:
 			if(!isGroup)
 				client.stopPrivateGUI(packet.getSrc());
 			sendACK(packet);
-			// TODO
 			break;
-		case Packet.FRG:
-		case Packet.LST:
+		case Packet.Flags.FRG:
+		case Packet.Flags.LST:
 			HashMap<Integer, Packet> packets = buffer.get(packet.getPacketID());
 			if (packets == null) {
 				packets = new HashMap<Integer, Packet>();
@@ -189,7 +181,6 @@ public class SingleConnection implements Observer {
 			if (checkBuffer(packet.getPacketID()))
 				flushBuffer(packet.getPacketID());
 			sendACK(packet);
-			// TODO
 			break;
 		default:
 			if (lastPacketReceived != packet.getSeqNr()) {
@@ -218,7 +209,7 @@ public class SingleConnection implements Observer {
 				return false;
 		}
 		Packet last = packets.get(packets.size() - 1);
-		return last != null && last.getFlag() == Packet.LST;
+		return last != null && last.getFlag() == Packet.Flags.LST;
 	}
 
 	private void flushBuffer(Integer ID) {

@@ -1,18 +1,20 @@
 package helper;
 
-import java.util.Arrays;
-import java.util.List;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 
 public class Packet implements Comparable<Packet> {
-	public final static byte ACK = 0x01; // Acknowledgement
-	public final static byte SYN = 0x02; // Synchronize
-	public final static byte FIN = 0x04; // Finish
-	public final static byte GRP = 0x08; // Group
-	public final static byte FRG = 0x10; // Fragmented
-	public final static byte LST = 0x20; // Last fragment
+	public class Flags {
+		public final static byte ACK = 0x01; // Acknowledgement
+		public final static byte SYN = 0x02; // Synchronize
+		public final static byte FIN = 0x04; // Finish
+		public final static byte GRP = 0x08; // Group
+		public final static byte FRG = 0x10; // Fragmented
+		public final static byte LST = 0x20; // Last fragment
+	}
+
 	public final static int HEADER_SIZE = 42;
 	public final static String ENCODING = "UTF-16BE";
 	private final static int BASICTTL = 12;
@@ -31,15 +33,15 @@ public class Packet implements Comparable<Packet> {
 		
 	/**
 	 * 
-	 * @param src
-	 * @param dest
-	 * @param seqNr
-	 * @param ackNr
-	 * @param flag
-	 * @param timeStamp
-	 * @param fragmentNr
-	 * @param offset
-	 * @param data
+	 * @param src Source IP-address
+	 * @param dest Destination IP-address
+	 * @param seqNr Sequence Number
+	 * @param ackNr Acknowledgement Number
+	 * @param flag Flag (see @Packet.Flags for more information)
+	 * @param timeStamp Timestamp of the message
+	 * @param fragmentNr Fragment number
+	 * @param offset Offset in the packet
+	 * @param data The payload of the packet
 	 */
 	public Packet(InetAddress src, InetAddress dest, int seqNr, int ackNr, byte flag, long timeStamp, 
 			int fragmentNr, int offset, String data) {
