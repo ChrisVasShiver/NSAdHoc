@@ -54,7 +54,8 @@ public class Packet implements Comparable<Packet> {
 		this.TTL = BASICTTL;
 		this.fragmentNr = fragmentNr;
 		this.offset = offset;
-		this.data = data;
+		if(data != null)
+			this.data = data;
 	}
 	
 	public Packet(byte[] raw) throws UnknownHostException {
