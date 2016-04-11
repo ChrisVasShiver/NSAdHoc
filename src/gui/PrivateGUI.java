@@ -176,12 +176,14 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     	message.setText(null);
     	conn.sendMessage(text);
     }
+    
     public void messageReceived(String text) {
     	String oldText = texta.getText();
     	AudioPlayer a = new AudioPlayer();
     	a.start();
     	a.playSound("newmsg.wav");
     	this.requestFocus();
+    	message.requestFocusInWindow();
     	if (getNotification)
     		flickicon.start();
     	texta.setText(oldText + text + System.lineSeparator());
@@ -192,6 +194,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        texta.setCaretPosition(texta.getDocument().getLength());
     }
     
     /*public void flickicon(){
