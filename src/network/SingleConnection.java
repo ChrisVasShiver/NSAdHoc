@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 import helper.DistanceVectorEntry;
 import helper.Packet;
@@ -86,9 +89,7 @@ public class SingleConnection implements Observer {
 		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.SYN,
 				System.currentTimeMillis(), 0, 0, null);
 		byte[] publicKey = hybridEnc.getPublicKey();
-
-		System.out.println("Public Key generated: " + Packet.dataToString(publicKey));
-		packet.setData(Packet.dataToString(publicKey));
+		packet.setData(Base64.encode(publicKey));
 		addPacket(packet);
 		System.out.println("Sent SYN");
 	}
@@ -97,10 +98,10 @@ public class SingleConnection implements Observer {
 		System.out.println("SYN ACK received");
 		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.SYN,
 				System.currentTimeMillis(), 0, 0, null);
-		System.out.println("Public Key received: " + Packet.dataToString(publicKey));
+		System.out.println("Public Key received: " + Arrays.toString(publicKey));
 		byte[] secretKey = hybridEnc.generateEncryptedKey(publicKey);
 		System.out.println("SecretKey generated");
-		packet.setData(Packet.dataToString(secretKey));
+		packet.setData(Base64.encode(secretKey));
 		addPacket(packet);
 	}
 	
@@ -143,7 +144,7 @@ public class SingleConnection implements Observer {
 		switch (packet.getFlag()) {
 		case Packet.Flags.ACK + Packet.Flags.SYN:
 			System.out.println("SYN ACK received");
-			hybridEnc.decryptAndStoreKey(Packet.dataToByteArray(packet.getData()));
+			hybridEnc.decryptAndStoreKey(Base64.decode(packet.getData()));
 			// No break; (INTENTIONAL!)
 		case Packet.Flags.ACK:
 			timerRunnable.remove(packet.getAckNr());
@@ -158,7 +159,7 @@ public class SingleConnection implements Observer {
 			break;
 		case Packet.Flags.SYN:
 			if(!isGroup) {
-				sendSYNACK(Packet.dataToByteArray(packet.getData()));
+				sendSYNACK(Base64.decode(packet.getData()));
 				client.startPrivateGUI(packet.getSrc());
 			}
 			sendACK(packet);
