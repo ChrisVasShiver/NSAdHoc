@@ -56,7 +56,7 @@ public class HybridEncryption {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		secretKey = new SecretKeySpec(encryptedKey, 0, encryptedKey.length, "AES");
+		secretKey = new SecretKeySpec(decryptedKey, 0, decryptedKey.length, "AES");
 	}
 
 	

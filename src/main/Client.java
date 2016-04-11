@@ -56,7 +56,7 @@ public class Client implements Observer {
 			multiSocket.joinGroup(group);
 			uniSocket = new DatagramSocket(uniPort);
 		} catch (IOException e) {
-			//TODO
+			//TODO remove stack trace
 			e.printStackTrace();
 		}
 		InetAddress localAddress = getLocalAddress();
@@ -109,7 +109,7 @@ public class Client implements Observer {
 	     try {
 			frame.setIconImage(ImageIO.read(new File("msn.png")));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			//TODO remove stack trace
 			e.printStackTrace();
 		}
 	}
@@ -135,7 +135,7 @@ public class Client implements Observer {
 			mlThread.join();
 			ulThread.join();
 		} catch(InterruptedException e) {
-			//TODO
+			//TODO remove stack trace
 			e.printStackTrace();
 		}
 		

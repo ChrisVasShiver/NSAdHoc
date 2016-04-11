@@ -9,10 +9,6 @@ public class RoutingTable extends Observable {
 
 	private ConcurrentHashMap<InetAddress, DistanceVectorEntry> routingTable = new ConcurrentHashMap<InetAddress, DistanceVectorEntry>();
 
-	public RoutingTable() {
-		// TODO Auto-generated constructor stub
-	}
-
 	public void put(InetAddress key, DistanceVectorEntry value) {
 			routingTable.put(key, value);
 			setChanged();

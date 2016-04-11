@@ -18,9 +18,9 @@ public class PacketFragmenter {
 				packet.setFragmentNr(i);
 				if(i == nrOfPackets - 1) {
 					packetDataSize = data.length % packetDataSize;
-					packet.setFlag(Packet.LST);
+					packet.setFlag(Packet.Flags.LST);
 				} else
-					packet.setFlag(Packet.FRG);
+					packet.setFlag(Packet.Flags.FRG);
 				packet.setOffset(i * packetDataSize);
 				byte[] packetData = new byte[packetDataSize];
 				System.arraycopy(data, i * maxDataSize, packetData, 0, packetDataSize);
