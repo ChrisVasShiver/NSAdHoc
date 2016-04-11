@@ -38,7 +38,6 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	// private JTextField txtf1;
 	private JButton send, attach;
 	private Client client;
-	private InetAddress other;
 	private SingleConnection conn;
 	private HashMap<InetAddress, PrivateGUI> pGUIs;
 	private JFileChooser fc;
@@ -59,7 +58,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		this.client = client;
 		this.conn = conn;
 		this.pGUIs = pGUIs;
-		frame = new JFrame(other.toString());
+		frame = new JFrame(conn.other.toString());
 		frame.addWindowListener(this);
 		this.setBackground(Color.WHITE);
 		frame.setContentPane(this);
