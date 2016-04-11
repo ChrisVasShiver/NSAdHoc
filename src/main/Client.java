@@ -142,7 +142,8 @@ public class Client implements Observer {
 	}
 
 	public void startPrivateGUI(InetAddress address) {
-				gui.privateGUI(address);
+		System.out.println("Client new window");
+		gui.privateGUI(address);
 	}
 			
 	public void stopPrivateGUI(InetAddress address) {

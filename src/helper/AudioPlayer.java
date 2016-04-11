@@ -1,11 +1,11 @@
 package helper;
 
 import java.io.File;
-import java.util.Random;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
 
 public class AudioPlayer extends Thread {
 	
@@ -21,12 +21,17 @@ public class AudioPlayer extends Thread {
 	public void playSound(String effectName) {
 		if(enabled) {
 			try {
-				AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(effectName).getAbsoluteFile());
-				clip = AudioSystem.getClip();
-				clip.open(audioInputStream);
-				clip.start();
+		        AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File(effectName));
+		        DataLine.Info info = new DataLine.Info(Clip.class, inputStream.getFormat());
+		        clip = (Clip)AudioSystem.getLine(info);
+		        clip.open(inputStream);
+		        clip.start();
+//				AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(effectName).getAbsoluteFile());
+//				clip = AudioSystem.getClip();
+//				clip.open(audioInputStream);
+//				clip.start();
 			} catch(Exception ex) {
-				//ex.printStackTrace();
+				ex.printStackTrace();
 			}
 		}
 	}

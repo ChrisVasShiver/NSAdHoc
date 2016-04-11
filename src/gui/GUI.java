@@ -196,6 +196,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	};
 
 	public void privateGUI(InetAddress other) {
+		System.out.println("Starting new window");
 		if (pGUIs.get(other) == null) {
 			SingleConnection conn = new SingleConnection(client, other);
 			PrivateGUI pGUI = new PrivateGUI(client, client.getLocalAddress(), other, conn, pGUIs);
