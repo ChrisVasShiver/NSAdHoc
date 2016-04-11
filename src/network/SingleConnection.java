@@ -89,7 +89,7 @@ public class SingleConnection implements Observer {
 		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.SYN,
 				System.currentTimeMillis(), 0, 0, null);
 		byte[] publicKey = hybridEnc.getPublicKey();
-		packet.setData(Base64.encodeBase64String(publicKey));
+		packet.setData(publicKey);
 		addPacket(packet);
 		System.out.println("Sent SYN");
 	}
@@ -101,7 +101,7 @@ public class SingleConnection implements Observer {
 		System.out.println("Public Key received: " + Arrays.toString(publicKey));
 		byte[] secretKey = hybridEnc.generateEncryptedKey(publicKey);
 		System.out.println("SecretKey generated");
-		packet.setData(Base64.encodeBase64String(secretKey));
+		packet.setData(secretKey);
 		addPacket(packet);
 	}
 	
@@ -144,6 +144,7 @@ public class SingleConnection implements Observer {
 		switch (packet.getFlag()) {
 		case Packet.Flags.SYN_ACK:
 			System.out.println("SYN ACK received");
+			System.out.println(packet.getData());
 			hybridEnc.decryptAndStoreKey(Base64.decodeBase64(packet.getData()));
 			// No break; (INTENTIONAL!)
 		case Packet.Flags.ACK:
@@ -192,7 +193,7 @@ public class SingleConnection implements Observer {
 					client.groupMessageReceived(message);
 				}
 				else {
-					byte[] decryptedMessage = hybridEnc.decryptMessage(Packet.dataToByteArray(packet.getData()));
+					byte[] decryptedMessage = hybridEnc.decryptMessage(packet.getData());
 					message += Packet.dataToString(decryptedMessage);
 					client.messageReceived(packet.getSrc(), message);
 				}

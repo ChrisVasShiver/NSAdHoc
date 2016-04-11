@@ -24,13 +24,13 @@ public class PacketFragmenter {
 				packet.setOffset(i * packetDataSize);
 				byte[] packetData = new byte[packetDataSize];
 				System.arraycopy(data, i * maxDataSize, packetData, 0, packetDataSize);
-				packet.setData(Packet.dataToString(packetData));
+				packet.setData(packetData);
 				packets.add(packet);
 			}
 		}
 		else {
 			Packet packet = header.copyHeader();
-			packet.setData(Packet.dataToString(data));
+			packet.setData(data);
 			packets.add(packet);
 		}
 		return packets;

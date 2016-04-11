@@ -5,8 +5,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Base64;
-
 public class Packet implements Comparable<Packet> {
 	public class Flags {
 		public final static byte ACK = 0x01; // Acknowledgement
@@ -18,7 +16,7 @@ public class Packet implements Comparable<Packet> {
 		public final static byte LST = 0x20; // Last fragment
 	}
 
-	public final static int HEADER_SIZE = 42;
+	public final static int HEADER_SIZE = 38;
 	public final static String ENCODING = "UTF-16BE";
 	private final static int BASICTTL = 12;
 	private int packetNumber = 0;
@@ -31,8 +29,7 @@ public class Packet implements Comparable<Packet> {
 	private int TTL;
 	private int fragmentNr;
 	private int offset;
-	private int dataL;
-	private String data;
+	private byte[] data;
 		
 	/**
 	 * 
@@ -47,7 +44,7 @@ public class Packet implements Comparable<Packet> {
 	 * @param data The payload of the packet
 	 */
 	public Packet(InetAddress src, InetAddress dest, int seqNr, int ackNr, byte flag, long timeStamp, 
-			int fragmentNr, int offset, String data) {
+			int fragmentNr, int offset, byte[] data) {
 		this.src = src;
 		this.dest = dest;
 		this.seqNr = seqNr;
@@ -57,10 +54,6 @@ public class Packet implements Comparable<Packet> {
 		this.TTL = BASICTTL;
 		this.fragmentNr = fragmentNr;
 		this.offset = offset;
-		if(data == null)
-			this.dataL = 0;
-		else
-			this.dataL = dataToByteArray(data).length;
 		this.data = data;
 	}
 	
@@ -74,7 +67,6 @@ public class Packet implements Comparable<Packet> {
 		this.TTL = (int)(raw[25]);
 		byte[] fragmentNr = new byte[4];
 		byte[] offset = new byte[4];
-		byte[] dataL = new byte[4];
 		byte[] packetID = new byte[4];
 		System.arraycopy(raw,  0, src, 0, 4);
 		this.src = InetAddress.getByAddress(src);
@@ -92,19 +84,13 @@ public class Packet implements Comparable<Packet> {
 		this.offset = Helper.byteArrayToInteger(offset);
 		System.arraycopy(raw, 34, packetID, 0, 4);
 		this.packetNumber = Helper.byteArrayToInteger(packetID);
-		System.arraycopy(raw, 38, dataL, 0, 4);
-		this.dataL = Helper.byteArrayToInteger(dataL);
-		byte[] data = new byte[this.dataL];
-		System.arraycopy(raw, 42, data, 0, this.dataL);
-		if(this.flag != Packet.Flags.GRP && this.flag == Packet.Flags.SYN_ACK)
-			this.data = Base64.encodeBase64String(data);
-		else
-			this.data = dataToString(data);
+		byte[] data = new byte[this.data.length];
+		System.arraycopy(raw, 38, data, 0, this.data.length);
 	}
 	
 	
 	public byte[] getBytes() {
-		byte[] result = new byte[HEADER_SIZE + dataL];
+		byte[] result = new byte[HEADER_SIZE + data.length];
 		System.arraycopy(src.getAddress(),  0, result, 0, 4);
 		System.arraycopy(dest.getAddress(), 0, result, 4, 4);
 		System.arraycopy(Helper.integerToByteArray(seqNr), 0, result, 8, 4);
@@ -115,14 +101,7 @@ public class Packet implements Comparable<Packet> {
 		System.arraycopy(Helper.integerToByteArray(fragmentNr), 0, result, 26, 4);
 		System.arraycopy(Helper.integerToByteArray(offset), 0, result, 30, 4);
 		System.arraycopy(Helper.integerToByteArray(packetNumber), 0, result, 34, 4);
-		System.arraycopy(Helper.integerToByteArray(dataL), 0, result, 38, 4);
-		byte[] data = null;
-		if(this.flag != Packet.Flags.GRP && this.flag == Packet.Flags.SYN_ACK)
-			data = Base64.decodeBase64(this.data);
-		else
-			data = dataToByteArray(this.data);
-		if(data != null)
-			System.arraycopy(data, 0, result, 42, data.length);
+		System.arraycopy(data, 0, result, 38, data.length);
 		return result;
 	}
 	
@@ -228,19 +207,14 @@ public class Packet implements Comparable<Packet> {
 		packetNumber = ID;
 	}
 	public int getDataL() {
-		return dataL;
+		return data.length;
 	}
 
-	public void setDataL(int dataL) {
-		this.dataL = dataL;
-	}
-
-	public String getData() {
+	public byte[] getData() {
 		return data;
 	}
 
-	public void setData(String data) {
-		this.dataL = dataToByteArray(data).length;
+	public void setData(byte[] data) {
 		this.data = data;
 	}
 

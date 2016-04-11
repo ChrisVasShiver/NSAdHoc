@@ -7,6 +7,8 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.codec.binary.Base64;
+
 public class HybridEncryption {
 	
 // for testing the code
@@ -15,10 +17,13 @@ public class HybridEncryption {
 		 HybridEncryption hb = new HybridEncryption();
 		 byte[] publicKey = hb.getPublicKey();
 		 byte[] key = hb.generateEncryptedKey(publicKey);
-		 hb.decryptAndStoreKey(key);	 
-		 byte[] m = hb.encryptMessage("Test string".getBytes("UTF-16BE"));
-		 byte[] message = hb.decryptMessage(m);
-		 System.out.println(new String(message, "UTF-16BE"));		 
+		 String test = "noQDopuxMGyR9FNIphrYlYw1WvA5/xpDQfW0jfphFOPhPuFcaEC9OmVU1J6UJHCLJh7cEf/zXSBCrByqhD0ylun0EABdu1V2uggPqRPWIOZy5/fbCET7DAFm0TeLgtZVq2kOhe+gUjvxHPG+2N9K2GTmE1FW97H1jD0gdSQoaaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+		 key = Base64.decodeBase64(test);
+		// hb.decryptAndStoreKey(key);	
+		 byte[] message = hb.asEn.decrypt(key);
+		 byte[] m = hb.encryptMessage(Base64.decodeBase64(test));
+		 //byte[] message = hb.decryptMessage(m);
+		 System.out.println(Base64.encodeBase64String(message));		 
 	 }
 	
 	public Key secretKey;
