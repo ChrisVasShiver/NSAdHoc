@@ -23,7 +23,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.filechooser.FileFilter;
@@ -34,8 +33,9 @@ import network.SingleConnection;
 
 public class PrivateGUI extends JPanel implements ActionListener, WindowListener  {
 	
+	private static final long serialVersionUID = 6883134327632102722L;
 	public JTextPane texta, message;
-	private JTextField txtf1;
+	//private JTextField txtf1;
 	private JButton send, attach;
 	private Client client;
 	private InetAddress other;

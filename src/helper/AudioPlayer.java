@@ -26,7 +26,7 @@ public class AudioPlayer extends Thread {
 				clip.open(audioInputStream);
 				clip.start();
 			} catch(Exception ex) {
-				ex.printStackTrace();
+				//ex.printStackTrace();
 			}
 		}
 	}
