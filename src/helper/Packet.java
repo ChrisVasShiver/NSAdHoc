@@ -96,7 +96,7 @@ public class Packet implements Comparable<Packet> {
 		this.dataL = Helper.byteArrayToInteger(dataL);
 		byte[] data = new byte[this.dataL];
 		System.arraycopy(raw, 42, data, 0, this.dataL);
-		if(this.flag != Packet.Flags.GRP && (this.flag == Packet.Flags.SYN_ACK || this.flag == Packet.Flags.SYN))
+		if(this.flag != Packet.Flags.GRP && this.flag == Packet.Flags.SYN_ACK)
 			this.data = Base64.encode(data);
 		else
 			this.data = dataToString(data);
