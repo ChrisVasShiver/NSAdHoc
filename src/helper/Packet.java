@@ -85,8 +85,10 @@ public class Packet implements Comparable<Packet> {
 		this.offset = Helper.byteArrayToInteger(offset);
 		System.arraycopy(raw, 34, packetID, 0, 4);
 		this.packetNumber = Helper.byteArrayToInteger(packetID);
-		byte[] data = new byte[this.data.length];
-		System.arraycopy(raw, 38, data, 0, this.data.length);
+		if(this.data.length > 0) {
+			byte[] data = new byte[this.data.length];
+			System.arraycopy(raw, 38, data, 0, this.data.length);
+		}
 	}
 	
 	
