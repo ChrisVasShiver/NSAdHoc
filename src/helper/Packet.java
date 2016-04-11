@@ -107,7 +107,7 @@ public class Packet implements Comparable<Packet> {
 		System.arraycopy(Helper.integerToByteArray(offset), 0, result, 30, 4);
 		System.arraycopy(Helper.integerToByteArray(packetNumber), 0, result, 34, 4);
 		System.arraycopy(Helper.integerToByteArray(dataL), 0, result, 38, 4);
-		if(data != null)
+		if(data != null && dataL != 0)
 			System.arraycopy(dataToByteArray(data), 0, result, 42, dataL);
 		return result;
 	}
