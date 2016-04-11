@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -183,14 +184,14 @@ public class SingleConnection implements Observer {
 	}
 	
 	private void flushBuffer(Integer ID) {
-		ArrayList<Byte> rawMessage = new ArrayList<Byte>();
+		System.out.println("Flushing buffer" );
+		String rawMessage = "";
 		HashMap<Integer, Packet> packetList = buffer.get(ID);
 		for(Packet packet : packetList.values())
-			for(byte b : packet.getBytes())
-				rawMessage.add(b);
+			rawMessage +=  packet.getData();
 		Packet header = buffer.get(ID).get(0);
 		String message = header.getSrc().getHostName() + " (" + new Date(header.getTimeStamp()) + "):"
-				+ System.lineSeparator() + " " + Packet.dataToString(rawMessage);
+				+ System.lineSeparator() + " " + rawMessage;
 		client.messageReceived(header.getSrc(), message);
 	}
 	

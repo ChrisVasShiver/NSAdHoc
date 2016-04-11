@@ -189,7 +189,6 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
     	texta.setText(oldText + text + System.lineSeparator());
     	try {
 			a.join();
-			flickicon.join();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
