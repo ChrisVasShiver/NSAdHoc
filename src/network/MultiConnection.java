@@ -21,11 +21,13 @@ public class MultiConnection {
 	public void setConnections() {
 		connections.clear();
 		for(InetAddress address : client.routingTable.keySet()) {
-			connections.add(new SingleConnection(this.client, address, true));
+			if(!client.getLocalAddress().equals(address))
+				connections.add(new SingleConnection(this.client, address, true));
 		}
 	}
 	
 	public void sendMessage(String message) {
+		setConnections();
 		for(SingleConnection conn : connections) {
 			conn.sendMessage(message);
 		}

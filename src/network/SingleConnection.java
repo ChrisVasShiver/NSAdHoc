@@ -143,12 +143,14 @@ public class SingleConnection implements Observer {
 			}
 			break;
 		case Packet.SYN:
-			client.startPrivateGUI(packet.getSrc());
+			if(!isGroup)
+				client.startPrivateGUI(packet.getSrc());
 			sendACK(packet);
 			// TODO
 			break;
 		case Packet.FIN:
-			client.stopPrivateGUI(packet.getSrc());
+			if(!isGroup)
+				client.stopPrivateGUI(packet.getSrc());
 			sendACK(packet);
 			// TODO
 			break;
@@ -201,7 +203,10 @@ public class SingleConnection implements Observer {
 		Packet header = buffer.get(ID).get(0);
 		String message = header.getSrc().getHostName() + " (" + new Date(header.getTimeStamp()) + "):"
 				+ System.lineSeparator() + " " + rawMessage;
-		client.messageReceived(header.getSrc(), message);
+		if(isGroup)
+			client.groupMessageReceived(message);
+		else
+			client.messageReceived(header.getSrc(), message);
 	}
 
 	public void sendACK(Packet packet) {
