@@ -145,7 +145,7 @@ public class SingleConnection implements Observer {
 	public void receiveMessage(Packet packet) {
 		System.out.println("Received packet: " + packet.getSeqNr() + " lastPacketReceived: " + lastPacketReceived);
 		if (packet.getSeqNr() < (lastPacketReceived + RWS)) {
-			if (packet.getSeqNr() > lastPacketReceived) {
+			if (packet.getSeqNr() > lastPacketReceived || packet.getSeqNr() == 0) {
 				receiveBuffer.put(packet.getSeqNr(), packet);
 				if (packet.getSeqNr() == (lastPacketReceived + 1))
 					flushReceiveWindow();
