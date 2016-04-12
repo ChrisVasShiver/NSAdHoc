@@ -24,7 +24,7 @@ public class MultiConnection implements Observer {
 
 	public MultiConnection(Client client) {
 		this.client = client;
-		client.ulRunnable.addObserver(this);
+		client.getUlRunnable().addObserver(this);
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class MultiConnection implements Observer {
 		DatagramPacket dpack = new DatagramPacket(packet.getBytes(), packet.getBytes().length, dve.nextHop,
 				client.uniPort);
 		try {
-			client.uniSocket.send(dpack);
+			client.getUniSocket().send(dpack);
 		} catch (IOException e) { }
 	}
 

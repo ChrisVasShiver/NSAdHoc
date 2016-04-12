@@ -49,7 +49,7 @@ public class SingleConnection implements Observer {
 		timerThread = new Thread(timerRunnable);
 		timerThread.start();
 		timerRunnable.addObserver(this);
-		client.ulRunnable.addObserver(this);
+		client.getUlRunnable().addObserver(this);
 		hybridEnc = new HybridEncryption();
 	}
 
@@ -61,7 +61,7 @@ public class SingleConnection implements Observer {
 		try {
 			timerThread.join();
 		} catch (InterruptedException e) {	}
-		client.ulRunnable.deleteObserver(this);
+		client.getUlRunnable().deleteObserver(this);
 		sendFIN();
 	}
 
@@ -155,7 +155,7 @@ public class SingleConnection implements Observer {
 		DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length,
 				client.routingTable.get(ackpkt.getDest()).nextHop, client.uniPort);
 		try {
-			client.uniSocket.send(pkt);
+			client.getUniSocket().send(pkt);
 		} catch (IOException e) {}
 	}
 	
@@ -172,7 +172,7 @@ public class SingleConnection implements Observer {
 		DatagramPacket dpack = new DatagramPacket(packet.getBytes(), packet.getBytes().length, dve.nextHop,
 				client.uniPort);
 		try {
-			client.uniSocket.send(dpack);
+			client.getUniSocket().send(dpack);
 		} catch (IOException e) { }
 
 		timerRunnable.put(packet.getSeqNr(), packet);

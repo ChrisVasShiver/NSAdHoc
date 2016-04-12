@@ -32,14 +32,15 @@ public class Client implements Observer {
 	private Thread ulThread;
 	private DistanceVectorThread dvRunnable;
 	private MultiListeningThread mlRunnable;
-	public UniListeningThread ulRunnable;
+	private UniListeningThread ulRunnable;
 	
 	private GUI gui;
 	
-	public MulticastSocket multiSocket;
-	public InetAddress group;
+	private MulticastSocket multiSocket;
+	private DatagramSocket uniSocket;
+	private InetAddress group;
+
 	public static final int multiPort = 6789;
-	public DatagramSocket uniSocket;
 	public static final int uniPort = 7000;
 	public static final int sendTimeout = 3000;
 	public static final int MAX_PACKET_SIZE = 1024;
@@ -102,14 +103,6 @@ public class Client implements Observer {
 			}
 		} catch(SocketException e) {} 
 		return null;
-	}
-	
-	/**
-	 * Getter for the GUI
-	 * @return the GUI object associated with this client
-	 */
-	public GUI getGUI() {
-		return gui;
 	}
 	
 	/**
@@ -187,6 +180,46 @@ public class Client implements Observer {
 	}
 	
 	/**
+	 * Getter for the GUI
+	 * @return the GUI object associated with this client
+	 */
+	public GUI getGUI() {
+		return gui;
+	}
+	
+	/**
+	 * Getter of the UniListeningThread
+	 * @return
+	 */
+	public UniListeningThread getUlRunnable() {
+		return ulRunnable;
+	}
+	
+	/**
+	 * Getter of the DatagramSocket
+	 * @return
+	 */
+	public DatagramSocket getUniSocket() {
+		return uniSocket;
+	}
+	
+	/**
+	 * Getter of the MulticastSocket
+	 * @return
+	 */
+	public MulticastSocket getMultiSocket() {
+		return multiSocket;
+	}
+	
+	/**
+	 * Getter for the group IPv4 address
+	 * @return
+	 */
+	public InetAddress getGroup() {
+		return group;
+	}
+	
+	/**
 	 * Is called when the routingTable is updated, will update the user list in GUI
 	 */
 	@Override
@@ -199,5 +232,7 @@ public class Client implements Observer {
 			}
 		}
 	}
+
+
 
 }

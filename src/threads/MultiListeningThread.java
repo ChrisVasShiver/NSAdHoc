@@ -24,7 +24,7 @@ public class MultiListeningThread implements Runnable {
 			byte[] buffer = new byte[DistanceVectorEntry.SIZE * 100];
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
-				client.multiSocket.receive(recvPacket);
+				client.getMultiSocket().receive(recvPacket);
 			} catch (IOException e) { }
 			if(!wait)
 				continue;
