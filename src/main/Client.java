@@ -19,7 +19,9 @@ import helper.RoutingTable;
 import threads.DistanceVectorThread;
 import threads.MultiListeningThread;
 import threads.UniListeningThread;
-
+/**
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
+ */
 public class Client implements Observer {
 	public RoutingTable routingTable = new RoutingTable();
 	public ConcurrentHashMap<InetAddress, Long> neighbourTimeout = new ConcurrentHashMap<InetAddress, Long>();
@@ -130,8 +132,8 @@ public class Client implements Observer {
 	public void stopPrivateGUI(InetAddress address) {
 		PrivateGUI pGUI = gui.getPGUIs().get(address);
 		if (pGUI != null){
-			String oldText = pGUI.texta.getText();
-			pGUI.texta.setText(oldText + address.getHostName() + " closed the connection" + System.lineSeparator());
+			String oldText = pGUI.getTextField().getText();
+			pGUI.getTextField().setText(oldText + address.getHostName() + " closed the connection" + System.lineSeparator());
 		}
 	}
 
