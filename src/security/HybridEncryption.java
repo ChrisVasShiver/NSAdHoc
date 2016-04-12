@@ -16,23 +16,24 @@ public class HybridEncryption {
 	 public static void main(String[] args) throws Exception{
 		 HybridEncryption hb = new HybridEncryption();
 		 byte[] publicKey = hb.getPublicKey();
+		 byte[] privateKey = hb.getPrivateKey();
 		 byte[] key = hb.generateEncryptedKey(publicKey);
-		 String test = "noQDopuxMGyR9FNIphrYlYw1WvA5/xpDQfW0jfphFOPhPuFcaEC9OmVU1J6UJHCLJh7cEf/zXSBCrByqhD0ylun0EABdu1V2uggPqRPWIOZy5/fbCET7DAFm0TeLgtZVq2kOhe+gUjvxHPG+2N9K2GTmE1FW97H1jD0gdSQoaaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-		 key = Base64.decodeBase64(test);
-		// hb.decryptAndStoreKey(key);	
-		 byte[] message = hb.asEn.decrypt(key);
-		 byte[] m = hb.encryptMessage(Base64.decodeBase64(test));
+		 hb.asEn.decrypt(key, privateKey);
+		 hb.decryptAndStoreKey(key);	
+//		 byte[] m = hb.encryptMessage(Base64.decodeBase64(test));
 		 //byte[] message = hb.decryptMessage(m);
-		 System.out.println(Base64.encodeBase64String(message));		 
+		// System.out.println(Base64.encodeBase64String(message));		 
 	 }
 	
 	public Key secretKey;
 	SymmetricEncryption symEn;
-	AsymmetricEncryption asEn;
+	public AsymmetricEncryption asEn;
 
 	public HybridEncryption() {
 		symEn = new SymmetricEncryption();
 		asEn = new AsymmetricEncryption();
+		System.out.println(asEn.getPrivateKey().getFormat());
+		System.out.println(asEn.getPublicKey().getFormat());
 	}
 
 	public byte[] generateEncryptedKey(byte[] publicKey){
@@ -53,6 +54,10 @@ public class HybridEncryption {
 
 	public byte[] getPublicKey() {
 		return asEn.getPublicKey().getEncoded();
+	}
+	
+	public byte[] getPrivateKey() {
+		return asEn.getPrivateKey().getEncoded();
 	}
 	public void decryptAndStoreKey(byte[] encryptedKey){
 		byte[] decryptedKey = null;
