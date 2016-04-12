@@ -61,11 +61,11 @@ public class MultiConnection implements Observer {
 	public void update(Observable arg0, Object arg1) {
 		if (arg0 instanceof UniListeningThread) {
 			Packet packet = (Packet) arg1;
-			if (packet.getDest().equals(GROUP) && !packet.getSrc().equals(client.getLocalAddress())) {
+			if (packet.getDest().equals(GROUP)) {
 				String msg = packet.getSrc().getHostName() + " (" + new Date(packet.getTimeStamp()) + "):"
 						+ System.lineSeparator() + " ";
 
-				msg += Packet.dataToString(packet.getData());
+				msg += Packet.dataToString(packet.getData()) + System.lineSeparator();
 				client.getGUI().setText(msg);
 			}
 		}

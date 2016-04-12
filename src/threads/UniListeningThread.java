@@ -32,7 +32,6 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 			}
 			Packet pkt = null;
 			try {
-				System.out.println(buffer[25]);
 				pkt = new Packet(buffer);
 			} catch (UnknownHostException | ArrayIndexOutOfBoundsException e) {
 				e.printStackTrace();
