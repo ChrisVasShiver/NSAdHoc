@@ -1,5 +1,7 @@
 package gui;
-
+/**
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
+ */
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -28,6 +30,7 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
 import helper.AudioPlayer;
+import helper.Constants;
 import main.Client;
 import network.SingleConnection;
 
@@ -35,11 +38,9 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 
 	private static final long serialVersionUID = 6883134327632102722L;
 	public JTextPane texta, message;
-	// private JTextField txtf1;
 	private JButton send, attach;
 	private Client client;
 	private SingleConnection conn;
-	private HashMap<InetAddress, PrivateGUI> pGUIs;
 	private JFileChooser fc;
 	private JScrollPane scrollPane;
 	private JScrollPane scrollMessage;
@@ -47,17 +48,17 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	private FlickIcon flickicon;
 	private boolean getNotification = false;
 	
-	FileFilter docFilter = new FileTypeFilter(".docx", "Microsoft Word Documents");
-	FileFilter pdfFilter = new FileTypeFilter(".pdf", "PDF Documents");
-	FileFilter xlsFilter = new FileTypeFilter(".xlsx", "Microsoft Excel Documents");
-	FileFilter jpgFilter = new FileTypeFilter(".jpg", "JPG Image");
-
-	public PrivateGUI(Client client, InetAddress me, SingleConnection conn,
-			HashMap<InetAddress, PrivateGUI> pGUIs) {
+	/**
+	 * Constructor of the Private GUI
+	 * @param client the user of the program
+	 * @param me the IP4 address of the user of the program
+	 * @param conn The connection between two clients
+	 * @param pGUIs 
+	 */
+	public PrivateGUI(Client client, InetAddress me, SingleConnection conn) {
 		flickicon = new FlickIcon(this);
 		this.client = client;
 		this.conn = conn;
-		this.pGUIs = pGUIs;
 		frame = new JFrame(conn.other.toString());
 		frame.addWindowListener(this);
 		this.setBackground(Color.WHITE);
@@ -72,7 +73,10 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		}
 		buildGUI();
 	}
-
+	
+	/**
+	 * Initiates all the elements in the GUI
+	 */
 	public void buildGUI() {
 		setLayout(new FlowLayout()); 
 
@@ -110,8 +114,9 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		add(attach);
 	}
 	
-
-
+	/**
+	 * Checks if an action in the GUI has taken place and does an appropriate follow-up
+	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == send && (!message.getText().isEmpty())) {
 			sendMessage(message.getText());
@@ -121,11 +126,11 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 			fileChooser.setSize(700, 500);
 			fc = new JFileChooser();
 			fileChooser.add(fc);
-			fileChooser.setVisible(true);
-			fc.addChoosableFileFilter(docFilter);
-			fc.addChoosableFileFilter(pdfFilter);
-			fc.addChoosableFileFilter(xlsFilter);
-			fc.addChoosableFileFilter(jpgFilter);
+			fileChooser.setVisible(false);
+			fc.addChoosableFileFilter(Constants.docFilter);
+			fc.addChoosableFileFilter(Constants.pdfFilter);
+			fc.addChoosableFileFilter(Constants.xlsFilter);
+			fc.addChoosableFileFilter(Constants.jpgFilter);
 
 			int result = fc.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION) {
@@ -148,6 +153,10 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		}
 	}
 
+	/**
+	 * Sends the message to another user.
+	 * @param text the text typed in by the users in the JTextPane
+	 */
 	public void sendMessage(String text) {
 		String oldText = texta.getText();
 		texta.setText(oldText + client.getLocalAddress().getHostName() + " (" + new Date(System.currentTimeMillis())
@@ -156,6 +165,10 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		conn.sendMessage(text);
 	}
 
+	/**
+	 * Shows a received message in the GUI
+	 * @param text the received message
+	 */
 	public void messageReceived(String text) {
 		String oldText = texta.getText();
 		AudioPlayer a = new AudioPlayer();
@@ -174,7 +187,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		}
 		texta.setCaretPosition(texta.getDocument().getLength());
 	}
-
+	
 	@Override
 	public void windowActivated(WindowEvent arg0) {
 		getNotification = false;
@@ -189,7 +202,8 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		pGUIs.remove(this.conn.other);
+		System.out.println("hoi");
+		client.getGUI().removePGUI(this.conn.other);
 		this.conn.stop();
 	}
 
