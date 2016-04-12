@@ -8,37 +8,43 @@ import java.util.Observer;
 
 import helper.Packet;
 import main.Client;
+import network.MultiConnection;
 
 public class UniListeningThread extends Observable implements Runnable, Observer {
 
 	public volatile boolean wait = true;
 	private Client client;
-	
+
 	public UniListeningThread(Client client) {
 		this.client = client;
 	}
 
 	@Override
 	public void run() {
-		while(wait) {
-	
+		while (wait) {
+
 			byte[] buffer = new byte[Client.MAX_PACKET_SIZE];
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
 				client.uniSocket.receive(recvPacket);
-			} catch (IOException e) {e.printStackTrace();}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			Packet pkt = null;
 			try {
 				System.out.println(buffer[25]);
 				pkt = new Packet(buffer);
-			} catch (UnknownHostException | ArrayIndexOutOfBoundsException e) { e.printStackTrace();continue; }
-			if(pkt != null) {
+			} catch (UnknownHostException | ArrayIndexOutOfBoundsException e) {
+				e.printStackTrace();
+				continue;
+			}
+			if (pkt != null) {
 				handlePacket(pkt);
 			}
-			
+
 		}
 	}
-	
+
 	public void handlePacket(Packet packet) {
 		if(packet == null)
 			return;
@@ -49,7 +55,12 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 			notifyObservers(packet);
 			clearChanged();
 			
-		} else {
+		} else if(packet.getDest().equals(MultiConnection.GROUP)) {
+			setChanged();
+			notifyObservers(packet);
+			clearChanged();
+		}
+			else {
 			if(!packet.isExpired()) {
 				packet.decreaseTTL();
 				DatagramPacket pkt = new DatagramPacket(packet.getBytes(), packet.getBytes().length,
@@ -61,10 +72,9 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 		}
 	}
 
-	
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

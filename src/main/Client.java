@@ -44,7 +44,6 @@ public class Client implements Observer {
 	public static final int MAX_PACKET_SIZE = 1024;
 	
 	public Client() {
-		this.gui = new GUI(this);
 		routingTable.addObserver(this);
 		try {
 			group = InetAddress.getByName("228.0.0.2");
@@ -62,7 +61,8 @@ public class Client implements Observer {
 	}
 	
 	public void start() {
-		startThreads();		
+		startThreads();	
+		this.gui = new GUI(this);
 	}
 	
 	public void stop() {
@@ -146,14 +146,13 @@ public class Client implements Observer {
 	}
 	
 	public void update(Observable arg0, Object arg1) {
-		gui.getUserList().removeAllElements();
-		for(InetAddress address : routingTable.keySet()) {
-//			if(!address.equals(getLocalAddress())) {
-				gui.getUserList().addElement(address);
-				gui.setGroupConnections();
-//			}
-	     }
-		
+		if(gui != null) {
+			gui.getUserList().removeAllElements();
+			for(InetAddress address : routingTable.keySet()) {
+				if(!address.equals(getLocalAddress()))
+					gui.getUserList().addElement(address);
+			}
+		}
 	}
 
 	public void groupMessageReceived(String message) {

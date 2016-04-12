@@ -36,7 +36,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
 
 import main.Client;
 import helper.Constants;
@@ -189,10 +188,6 @@ public class GUI extends JPanel{
 		} else {
 			pGUIs.get(other).requestFocus();
 		}
-	}
-
-	public void setGroupConnections() {
-		connections.setConnections();
 	}
 
 	public void sendMessage(String text) {

@@ -22,7 +22,7 @@ public class DistanceVectorThread implements Runnable {
 			try {
 				client.multiSocket.send(getDatagramPacket());
 				Thread.sleep(Client.sendTimeout);
-			} catch (InterruptedException | IOException e) { e.printStackTrace(); }
+			} catch (InterruptedException | IOException e) { }
 		}
 	}
 	
