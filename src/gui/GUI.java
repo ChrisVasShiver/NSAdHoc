@@ -34,7 +34,6 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
-import javax.swing.filechooser.FileFilter;
 
 import main.Client;
 import helper.Constants;
@@ -42,11 +41,10 @@ import helper.Constants;
 import network.MultiConnection;
 import network.SingleConnection;
 
+/**
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
+ */
 public class GUI extends JPanel implements ActionListener, WindowListener {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private JFrame frame;
 	private JTextPane texta, message;
@@ -59,13 +57,18 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	private JFileChooser fc;
 	private Client client;
 	private MultiConnection connections;
-
+	/**
+	 * Constructor of the GUI
+	 * @param client the client
+	 */
 	public GUI(Client client) {
 		this.client = client;
 		this.connections = new MultiConnection(client);
 		buildGUI();
 	}
-
+	/**
+	 * Initiates all the elements in the GUI
+	 */
 	public void buildGUI() {		
 		setLayout(new FlowLayout()); 
 		
@@ -117,31 +120,41 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		attach.addActionListener(this);
 		add(attach);
 		
-		 frame = new JFrame("Chatbox");
-	     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-	     setBackground(Color.WHITE);
-	     frame.setContentPane(this);
-	     frame.setSize(700, 500);
-	     frame.setVisible(true);
-	     try {
-			frame.setIconImage(ImageIO.read(new File("msn.png")));
+		frame = new JFrame("Chatbox");
+	    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+	    setBackground(Color.WHITE);
+	    frame.setContentPane(this);
+	    frame.setSize(700, 500);
+	    frame.setVisible(true);
+	    try {
+	    	frame.setIconImage(ImageIO.read(new File("msn.png")));
 		} catch (IOException e) {
 			//TODO remove stack trace
 			e.printStackTrace();
 		}
-
 	}
-
+	
+	/**
+	 * Gets the currecnt time
+	 * @return a string of the current time in HH:mm:ss
+	 */
 	public String getTime() {
 		Calendar cal = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 		return " (" + sdf.format(cal.getTime()) + ") ";
 	}
 	
-	public  HashMap<InetAddress, PrivateGUI> getPGUIs() {
+	/**
+	 * Gets the HashMap containing all the opened private GUIs
+	 * @return a HashMap with InetAddress as keys and privateGUI as values
+	 */
+	public HashMap<InetAddress, PrivateGUI> getPGUIs() {
 		return pGUIs;
 	}
 
+	/**
+	 * Checks if an action in the GUI has taken place and does an appropriate follow-up
+	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == send && (!message.getText().isEmpty())) {
 			sendMessage(message.getText());
@@ -233,6 +246,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
+		client.stop();
 		// TODO Auto-generated method stub
 	}
 
@@ -264,9 +278,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	public class shiftEnter extends AbstractAction{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			String tempTXT = message.getText();
-			tempTXT = tempTXT + System.lineSeparator();
-			message.setText(tempTXT);
+			message.setText(message.getText() + System.lineSeparator());
 		}
 	};
 	
