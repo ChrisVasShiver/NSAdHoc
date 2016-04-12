@@ -42,9 +42,6 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 	public void handlePacket(Packet packet) {
 		if(packet == null)
 			return;
-
-		System.out.println(packet.getTTL());
-		System.out.println(packet.isExpired());
 		if(packet.getDest().equals(client.getLocalAddress())) {
 			if(packet.getFlag() == Packet.Flags.SYN) 
 				client.startPrivateGUI(packet.getSrc());
@@ -53,9 +50,7 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 			clearChanged();
 			
 		} else {
-			if(true) {
-				System.out.println("TTL: " + packet.getTTL());
-				System.out.println("handlePacket notExpired");
+			if(!packet.isExpired()) {
 				packet.decreaseTTL();
 				DatagramPacket pkt = new DatagramPacket(packet.getBytes(), packet.getBytes().length,
 						client.routingTable.get(packet.getDest()).nextHop, client.uniPort);

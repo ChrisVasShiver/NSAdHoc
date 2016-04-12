@@ -149,7 +149,7 @@ public class Packet implements Comparable<Packet> {
 	}
 	
 	public boolean isExpired() {
-		return TTL==0;
+		return TTL <= 0;
 	}
 	
 	public void decreaseTTL() {
