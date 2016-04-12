@@ -27,9 +27,9 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
 				client.uniSocket.receive(recvPacket);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			} catch (IOException e) {}
+			if(!wait)
+				continue;
 			Packet pkt = null;
 			try {
 				pkt = new Packet(buffer);

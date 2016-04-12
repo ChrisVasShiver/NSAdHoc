@@ -21,6 +21,10 @@ import security.HybridEncryption;
 import threads.TimerThread;
 import threads.UniListeningThread;
 
+/**
+ * Class for a secured single connection between two nodes
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
+ */
 public class SingleConnection implements Observer {
 
 	private TimerThread timerRunnable;
@@ -30,8 +34,8 @@ public class SingleConnection implements Observer {
 	private int lastSeqnr = 1;
 	private int lastPacketID = 1;
 	private int lastPacketReceived = 0;
-	private final int SWS = 10;
-	private final int RWS = 50;
+	private final static int SWS = 10;
+	private final static int RWS = 50;
 	private List<Packet> queue = new ArrayList<Packet>();
 	private HashMap<Integer, HashMap<Integer, Packet>> buffer = new HashMap<Integer, HashMap<Integer, Packet>>();
 	private List<Packet> sentWindow = new ArrayList<Packet>();
@@ -49,19 +53,24 @@ public class SingleConnection implements Observer {
 		hybridEnc = new HybridEncryption();
 	}
 
+	/**
+	 * Tries to stop the thread
+	 */
 	public void stop() {
 		timerRunnable.wait = false;
 		try {
 			timerThread.join();
-		} catch (InterruptedException e) {
-			// TODO remove stack trace
-			e.printStackTrace();
-		}
+		} catch (InterruptedException e) {	}
 		client.ulRunnable.deleteObserver(this);
 		sendFIN();
 	}
 
-	protected void addPackets(List<Packet> packets) {
+	/**
+	 * Add a list of packets to the queue
+	 * will send a packet if the sentWindow is not full
+	 * @param packets Packets to be added
+	 */
+	private void addPackets(List<Packet> packets) {
 		for (Packet packet : packets) {
 			packet.setPacketID(lastPacketID);
 			addPacket(packet);
@@ -69,12 +78,21 @@ public class SingleConnection implements Observer {
 		lastPacketID++;
 	}
 
+	/**
+	 * Add a single packet to the queue,
+	 * will send a packet if the sentWindow is not full
+	 * @param packet The packet to be added
+	 */
 	private void addPacket(Packet packet) {
 		queue.add(packet);
 		if (sentWindow.size() <= SWS)
 			transmitPacket(queue.remove(0));
 	}
 
+	/**
+	 * Sends an encrypted message to the other node
+	 * @param message
+	 */
 	public void sendMessage(String message) {
 		byte[] encryptedMessage = hybridEnc.encryptMessage(Packet.dataToByteArray(message));
 		Packet header = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, (byte) 0, System.currentTimeMillis(),
@@ -83,6 +101,10 @@ public class SingleConnection implements Observer {
 		addPackets(packets);
 	}
 
+	/**
+	 * Sends an encrypted file to the other node
+	 * @param file
+	 */
 	public void sendFile(FilePacket file) {
 		byte[] encryptedData = hybridEnc.encryptMessage(file.getBytes());
 		Packet header = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.FILE,
@@ -91,6 +113,9 @@ public class SingleConnection implements Observer {
 		addPackets(packets);
 	}
 
+	/**
+	 * Send a SYN packet (for starting up the connection)
+	 */
 	public void sendSYN() {
 		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.SYN,
 				System.currentTimeMillis(), 0, 0, null);
@@ -99,6 +124,10 @@ public class SingleConnection implements Observer {
 		addPacket(packet);
 	}
 
+	/**
+	 * Send a SYN_ACK packet (for acknowledging a SYN and generating the shared secret key)
+	 * @param publicKey The received public key in the previous SYN packet
+	 */
 	public void sendSYNACK(byte[] publicKey) {
 		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.SYN_ACK,
 				System.currentTimeMillis(), 0, 0, null);
@@ -107,12 +136,33 @@ public class SingleConnection implements Observer {
 		addPacket(packet);
 	}
 
+	/**
+	 * Sends a FIN packet
+	 */
 	public void sendFIN() {
 		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.FIN,
 				System.currentTimeMillis(), 0, 0, null);
 		addPacket(packet);
 	}
 
+	/**
+	 * Send an ACK packet
+	 * @param packet
+	 */
+	public void sendACK(Packet packet) {
+		Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(), 0, packet.getSeqNr(), (byte) 0x01,
+				System.currentTimeMillis(), 0, 0, null);
+		DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length,
+				client.routingTable.get(ackpkt.getDest()).nextHop, client.uniPort);
+		try {
+			client.uniSocket.send(pkt);
+		} catch (IOException e) {}
+	}
+	
+	/**
+	 * Send a packet over UDP, will only work when the destination in the routing table exists
+	 * @param packet
+	 */
 	private void sendPacket(Packet packet) {
 		DistanceVectorEntry dve = client.routingTable.get(other);
 		if (dve == null) {
@@ -123,18 +173,23 @@ public class SingleConnection implements Observer {
 				client.uniPort);
 		try {
 			client.uniSocket.send(dpack);
-		} catch (IOException e) {
-			// TODO remove stack trace
-			e.printStackTrace();
-		}
+		} catch (IOException e) { }
 
 		timerRunnable.put(packet.getSeqNr(), packet);
 	}
 
+	/**
+	 * Retransmit a packet (ignoring the sent window)
+	 * @param packet
+	 */
 	private void retransmitPacket(Packet packet) {
 		sendPacket(packet);
 	}
 
+	/**
+	 * Transmit a packet, the sequence number will be increased
+	 * @param packet
+	 */
 	private void transmitPacket(Packet packet) {
 		packet.setSeqNr(lastSeqnr);
 		sentWindow.add(packet);
@@ -142,18 +197,31 @@ public class SingleConnection implements Observer {
 		lastSeqnr++;
 	}
 
+	/**
+	 * Is called when a message for this client is received
+	 * @param packet
+	 */
 	public void receiveMessage(Packet packet) {
+		// Handle ACKs directly
 		if (packet.getFlag() == Packet.Flags.ACK)
 			flushMessage(packet);
+		// Only handle packets that have a sequence number lower than lastPacketReceived + RWS
 		if (packet.getSeqNr() < (lastPacketReceived + RWS)) {
+			// If the packet is handled already, just send an ACK, otherwise put it in the buffer 
 			if (packet.getSeqNr() > lastPacketReceived) {
 				receiveBuffer.put(packet.getSeqNr(), packet);
+				// If this packet is to be handled, flush the buffer
 				if (packet.getSeqNr() == (lastPacketReceived + 1))
 					flushReceiveWindow();
-			}
+			} else
+				sendACK(packet);
 		}
 	}
 
+	/**
+	 * Handle the packet and flush the data to the application layer
+	 * @param packet
+	 */
 	public void flushMessage(Packet packet) {
 		switch (packet.getFlag()) {
 		case Packet.Flags.SYN_ACK:
@@ -215,6 +283,10 @@ public class SingleConnection implements Observer {
 		}
 	}
 
+	/**
+	 * Try to flush the receive window (buffer)
+	 * Will call flush message for all consecutive packets beginning at lastPacketReceived
+	 */
 	private void flushReceiveWindow() {
 		for (Integer seq : receiveBuffer.keySet()) {
 			if (seq.equals(lastPacketReceived + 1)) {
@@ -225,6 +297,11 @@ public class SingleConnection implements Observer {
 		}
 	}
 
+	/**
+	 * Check the fragment buffer whether all fragments for this packet are received or not
+	 * @param ID The packet ID in the buffer
+	 * @return
+	 */
 	private boolean checkBuffer(Integer ID) {
 		HashMap<Integer, Packet> packets = buffer.get(ID);
 		for (int i = 0; i < packets.size(); i++) {
@@ -235,6 +312,10 @@ public class SingleConnection implements Observer {
 		return last != null && (last.getFlag() == Packet.Flags.LST || last.getFlag() == Packet.Flags.FILE_LST);
 	}
 
+	/**
+	 * Flush all the fragments of the packet to the application layer (may be a text message or a file)
+	 * @param ID The packet ID in the buffer
+	 */
 	private void flushBuffer(Integer ID) {
 		List<Byte> rawMessage = new ArrayList<Byte>();
 		HashMap<Integer, Packet> packetList = buffer.get(ID);
@@ -243,6 +324,7 @@ public class SingleConnection implements Observer {
 				rawMessage.add(b);
 		Packet header = buffer.get(ID).get(0);
 		String message = "";
+		// Handle file
 		if (header.getFlag() == Packet.Flags.FILE_FRG || header.getFlag() == Packet.Flags.FILE_LST) {
 			byte[] decryptedMessage = hybridEnc.decryptMessage(Helper.byteListToArray(rawMessage));
 			FilePacket file = new FilePacket(decryptedMessage);
@@ -250,28 +332,24 @@ public class SingleConnection implements Observer {
 			decoder.decode(file.getFilename());
 			message += header.getSrc().getHostName() + " (" + new Date(header.getTimeStamp()) + ") sent a file: "
 					+ file.getFilename();
-			System.out.println("File decoded");
-		} else {
+		}
+		// Handle text message
+		else {
 			message += header.getSrc().getHostName() + " (" + new Date(header.getTimeStamp()) + "):"
 					+ System.lineSeparator() + " ";
 			byte[] decryptedMessage = hybridEnc.decryptMessage(Helper.byteListToArray(rawMessage));
 			message += Packet.dataToString(decryptedMessage);
 		}
+		// Notify message
 		client.messageReceived(header.getSrc(), message);
 	}
 
-	public void sendACK(Packet packet) {
-		Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(), 0, packet.getSeqNr(), (byte) 0x01,
-				System.currentTimeMillis(), 0, 0, null);
-		DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length,
-				client.routingTable.get(ackpkt.getDest()).nextHop, client.uniPort);
-		try {
-			client.uniSocket.send(pkt);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+	
+	/**
+	 * Is called when a packet is received
+	 * Will handle packets that are for this connection (source == other and destination == client)
+	 * Will handle packet timeouts by retransmitting that packet
+	 */
 	@Override
 	public void update(Observable arg0, Object packet) {
 		if (arg0 instanceof UniListeningThread) {
