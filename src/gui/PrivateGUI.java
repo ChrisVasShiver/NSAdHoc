@@ -126,6 +126,7 @@ public class PrivateGUI extends JPanel {
 		frame.addWindowListener(privateGUIController);
 		this.setBackground(Color.WHITE);
 		frame.setContentPane(this);
+		frame.setResizable(false);
 		frame.setSize(700, 500);
 		frame.setVisible(true);
 		try {
@@ -161,7 +162,7 @@ public class PrivateGUI extends JPanel {
 		String oldText = texta.getText();
 		AudioPlayer a = new AudioPlayer();
 		a.start();
-		a.playSound("newmsg.wav");
+		a.playSound(Constants.SONGS[0]);
 		this.requestFocus();
 		message.requestFocusInWindow();
 		if (getNotification)
