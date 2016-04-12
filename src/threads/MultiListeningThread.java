@@ -24,18 +24,17 @@ public class MultiListeningThread implements Runnable {
 			byte[] buffer = new byte[DistanceVectorEntry.SIZE * 100];
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
-				client.multiSocket.receive(recvPacket);
-//				printRoutingTable();
-			} catch (IOException e) {e.printStackTrace();}
+				client.getMultiSocket().receive(recvPacket);
+			} catch (IOException e) { }
+			if(!wait)
+				continue;
 			checkTimeoutElapsed();
 			InetAddress sender = null;
 			try {
 				sender = InetAddress.getByName(recvPacket.getSocketAddress().toString().split(":")[0].replace("/", ""));
-			} catch (UnknownHostException e) {e.printStackTrace(); }
+			} catch (UnknownHostException e) {e.printStackTrace();}
 			if(sender.equals(client.getLocalAddress()))
 				continue;
-//			if(sender.toString().equals("/192.168.5.2"))	
-//				continue;
 			client.neighbourTimeout.put(sender, System.currentTimeMillis());
 			handleDistanceVectorPacket(buffer, sender);
 		}

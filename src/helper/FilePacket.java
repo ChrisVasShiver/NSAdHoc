@@ -1,7 +1,9 @@
 package helper;
 
 import java.io.UnsupportedEncodingException;
-
+/**
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher 
+ */
 public class FilePacket {
 	private static final String ASCII = "ASCII";
 	private String filename;
@@ -12,6 +14,10 @@ public class FilePacket {
 		this.data = data;
 	}
 	
+	/**
+	 * Builds up a raw packet that can be send.
+	 * @param rawPacket packet yet to be build
+	 */
 	public FilePacket(byte[] rawPacket) {
 		byte[] filenameLength = new byte[4];
 		System.arraycopy(rawPacket, 0, filenameLength, 0, 4);
@@ -26,6 +32,10 @@ public class FilePacket {
 		System.arraycopy(rawPacket, 4 + fLength + 4, this.data, 0, dLength);
 	}
 	
+	/**
+	 * 
+	 * @return bytes that can be send
+	 */
 	public byte[] getBytes() {
 		byte[] filenameBytes = encodeString(this.filename);
 		int fLength = filenameBytes.length;
@@ -45,6 +55,11 @@ public class FilePacket {
 		return data;
 	}
 	
+	/**
+	 * Turns bs into ASCII symbols
+	 * @param bs bytes to be decoded
+	 * @return String of ASCII symbols
+	 */
 	private static String decodeString(byte[] bs) {
 		String result = null;
 		try {
@@ -56,6 +71,11 @@ public class FilePacket {
 		return result;
 	}
 	
+	/**
+	 * Turns s into a array of bytes
+	 * @param s String of ASCII symbols
+	 * @return array of bytes
+	 */
 	private static byte[] encodeString(String s) {
 		byte[] result = null;
 		try {

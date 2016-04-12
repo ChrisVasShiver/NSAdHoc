@@ -36,7 +36,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
 
 import main.Client;
 import helper.Constants;
@@ -191,20 +190,17 @@ public class GUI extends JPanel{
 		}
 	}
 
-	public void setGroupConnections() {
-		connections.setConnections();
-	}
-
 	public void sendMessage(String text) {
 		String oldText = texta.getText();
-		texta.setText(oldText + client.getLocalAddress().getHostName() + " (" + new Date(System.currentTimeMillis())
-				+ "):" + System.lineSeparator() + " " + text + System.lineSeparator());
+//		texta.setText(oldText + client.getLocalAddress().getHostName() + " (" + new Date(System.currentTimeMillis())
+//				+ "):" + System.lineSeparator() + " " + text + System.lineSeparator());
 		message.setText(null);
 		connections.sendMessage(text);
 	}
 
 	public void setText(String message) {
 		this.texta.setText(texta.getText() + System.lineSeparator() + message);
+		texta.setCaretPosition(texta.getDocument().getLength());
 	}
 	
 	public void removePGUI(InetAddress other) {

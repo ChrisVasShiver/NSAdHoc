@@ -8,43 +8,45 @@ import java.util.Observer;
 
 import helper.Packet;
 import main.Client;
+import network.MultiConnection;
 
 public class UniListeningThread extends Observable implements Runnable, Observer {
 
 	public volatile boolean wait = true;
 	private Client client;
-	
+
 	public UniListeningThread(Client client) {
 		this.client = client;
 	}
 
 	@Override
 	public void run() {
-		while(wait) {
-	
+		while (wait) {
+
 			byte[] buffer = new byte[Client.MAX_PACKET_SIZE];
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
-				client.uniSocket.receive(recvPacket);
-			} catch (IOException e) {e.printStackTrace();}
+				client.getUniSocket().receive(recvPacket);
+			} catch (IOException e) {}
+			if(!wait)
+				continue;
 			Packet pkt = null;
 			try {
-				System.out.println(buffer[25]);
 				pkt = new Packet(buffer);
-			} catch (UnknownHostException | ArrayIndexOutOfBoundsException e) { e.printStackTrace();continue; }
-			if(pkt != null) {
+			} catch (UnknownHostException | ArrayIndexOutOfBoundsException e) {
+				e.printStackTrace();
+				continue;
+			}
+			if (pkt != null) {
 				handlePacket(pkt);
 			}
-			
+
 		}
 	}
-	
+
 	public void handlePacket(Packet packet) {
 		if(packet == null)
 			return;
-
-		System.out.println(packet.getTTL());
-		System.out.println(packet.isExpired());
 		if(packet.getDest().equals(client.getLocalAddress())) {
 			if(packet.getFlag() == Packet.Flags.SYN) 
 				client.startPrivateGUI(packet.getSrc());
@@ -52,24 +54,26 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 			notifyObservers(packet);
 			clearChanged();
 			
-		} else {
-			if(true) {
-				System.out.println("TTL: " + packet.getTTL());
-				System.out.println("handlePacket notExpired");
+		} else if(packet.getDest().equals(MultiConnection.GROUP)) {
+			setChanged();
+			notifyObservers(packet);
+			clearChanged();
+		}
+			else {
+			if(!packet.isExpired()) {
 				packet.decreaseTTL();
 				DatagramPacket pkt = new DatagramPacket(packet.getBytes(), packet.getBytes().length,
 						client.routingTable.get(packet.getDest()).nextHop, client.uniPort);
 				try {
-					client.uniSocket.send(pkt);
+					client.getUniSocket().send(pkt);
 				} catch (IOException e) { e.printStackTrace(); }
 			}
 		}
 	}
 
-	
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

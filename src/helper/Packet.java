@@ -20,7 +20,7 @@ public class Packet implements Comparable<Packet> {
 
 	public final static int HEADER_SIZE = 42;
 	public final static String ENCODING = "UTF-16BE";
-	private final static int BASICTTL = 12;
+	private final static byte BASICTTL = 12;
 	private int packetNumber = 0;
 	private InetAddress src;
 	private InetAddress dest;
@@ -28,7 +28,7 @@ public class Packet implements Comparable<Packet> {
 	private int ackNr;
 	private byte flag;
 	private long timeStamp;
-	private int TTL;
+	private byte TTL;
 	private int fragmentNr;
 	private int offset;
 	private int dataL;
@@ -71,7 +71,7 @@ public class Packet implements Comparable<Packet> {
 		byte[] ackNr = new byte[4];
 		this.flag = raw[16];
 		byte[] timeStamp = new byte[8];
-		this.TTL = (int)(raw[25]);
+		this.TTL = raw[25];
 		byte[] fragmentNr = new byte[4];
 		byte[] offset = new byte[4];
 		byte[] packetID = new byte[4];
@@ -109,7 +109,7 @@ public class Packet implements Comparable<Packet> {
 		System.arraycopy(Helper.integerToByteArray(ackNr), 0, result, 12, 4);
 		result[16] = flag;
 		System.arraycopy(Helper.longToByteArray(timeStamp), 0, result, 17, 8);
-		System.arraycopy(Helper.integerToByteArray(TTL), 0, result, 25, 1);
+		result[25] = TTL;
 		System.arraycopy(Helper.integerToByteArray(fragmentNr), 0, result, 26, 4);
 		System.arraycopy(Helper.integerToByteArray(offset), 0, result, 30, 4);
 		System.arraycopy(Helper.integerToByteArray(packetNumber), 0, result, 34, 4);
@@ -149,7 +149,7 @@ public class Packet implements Comparable<Packet> {
 	}
 	
 	public boolean isExpired() {
-		return TTL==0;
+		return TTL <= 0;
 	}
 	
 	public void decreaseTTL() {
@@ -205,11 +205,11 @@ public class Packet implements Comparable<Packet> {
 		this.timeStamp = timeStamp;
 	}
 
-	public int getTTL() {
+	public byte getTTL() {
 		return TTL;
 	}
 
-	public void setTTL(int tTL) {
+	public void setTTL(byte tTL) {
 		TTL = tTL;
 	}
 
