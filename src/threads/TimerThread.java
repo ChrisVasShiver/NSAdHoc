@@ -21,10 +21,7 @@ public class TimerThread extends Observable implements Runnable {
 			checkTimeouts();
 			try {
 				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} catch (InterruptedException e) {	}
 		}
 	
 
@@ -36,7 +33,6 @@ public class TimerThread extends Observable implements Runnable {
 			Packet packet = packetList.get(i);
 			long timeSent = packet.getTimeStamp();
 			if(now - timeSent > PACKET_TIMEOUT) {
-				System.out.println("Timer elapsed!");
 				setChanged();
 				notifyObservers(packet);
 				clearChanged();
