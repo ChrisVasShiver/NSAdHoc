@@ -12,7 +12,7 @@ import javax.crypto.NoSuchPaddingException;
 
 public class SymmetricEncryption {
 
-	final static String algorithm = "AES";
+	private final static String algorithm = "AES";
 	private static Cipher aescipher;
 
 	public SymmetricEncryption() {
