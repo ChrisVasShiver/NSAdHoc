@@ -134,6 +134,7 @@ public class Client implements Observer {
 		if (pGUI != null){
 			String oldText = pGUI.getTextField().getText();
 			pGUI.getTextField().setText(oldText + address.getHostName() + " closed the connection" + System.lineSeparator());
+			pGUI.setHasConnection(false);
 		}
 	}
 

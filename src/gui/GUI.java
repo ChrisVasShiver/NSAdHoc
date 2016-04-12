@@ -109,8 +109,7 @@ public class GUI extends JPanel{
 		message.getActionMap().put("shiftenter", new shiftEnter());
 		message.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "sendText");
 		message.getActionMap().put("sendText", new sendText());
-		Document document = message.getDocument();
-		document.addDocumentListener(guiController);
+		message.getDocument().addDocumentListener(guiController);
 		
 		JScrollPane scrollMessage = new JScrollPane(message);
 		scrollMessage.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);

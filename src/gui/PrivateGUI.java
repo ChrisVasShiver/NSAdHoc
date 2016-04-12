@@ -23,6 +23,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import helper.AudioPlayer;
 import helper.Constants;
@@ -33,9 +35,10 @@ import network.SingleConnection;
 /**
  * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
  */
-public class PrivateGUI extends JPanel implements ActionListener, WindowListener {
+public class PrivateGUI extends JPanel {
 
 	private static final long serialVersionUID = 6883134327632102722L;
+	private PrivateGUIController privateGUIController;
 	private JTextPane texta, message;
 	private JButton send, attach;
 	private Client client;
@@ -46,6 +49,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	private JFrame frame;
 	private FlickIcon flickicon;
 	private boolean getNotification = false;
+	private boolean hasConnection = false;
 	
 	/**
 	 * Constructor of the Private GUI
@@ -55,9 +59,11 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	 * @param pGUIs 
 	 */
 	public PrivateGUI(Client client, InetAddress me, SingleConnection conn) {
+		privateGUIController = new PrivateGUIController(this);
 		flickicon = new FlickIcon(this);
 		this.client = client;
 		this.conn = conn;
+		hasConnection = true;
 		buildGUI();
 	}
 	
@@ -69,6 +75,13 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		return frame;
 	}
 	
+	public boolean getHasConnection() {
+		return hasConnection;
+	}
+	
+	public void setHasConnection(boolean bool) {
+		hasConnection = bool;
+	}
 	/**
 	 * Initiates all the elements in the GUI
 	 */
@@ -92,6 +105,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		message.getActionMap().put("shiftenter", new shiftEnter());
 		message.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0, false), "sendText");
 		message.getActionMap().put("sendText", new sendText());
+		message.getDocument().addDocumentListener(privateGUIController);
 		
 		scrollMessage = new JScrollPane(message);
 		scrollMessage.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -100,16 +114,17 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		add(scrollMessage);
 
 		send = new JButton("Send");
-		send.addActionListener(this);
+		send.setEnabled(false);
+		send.addActionListener(privateGUIController);
 		send.setPreferredSize(new Dimension(170, 100));
 		add(send);
 
 		attach = new JButton("attach");
-		attach.addActionListener(this);
+		attach.addActionListener(privateGUIController);
 		add(attach);
 		
 		frame = new JFrame(conn.other.toString());
-		frame.addWindowListener(this);
+		frame.addWindowListener(privateGUIController);
 		this.setBackground(Color.WHITE);
 		frame.setContentPane(this);
 		frame.setSize(700, 500);
@@ -119,43 +134,6 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Checks if an action in the GUI has taken place and does an appropriate follow-up
-	 */
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == send && (!message.getText().isEmpty())) {
-			sendMessage(message.getText());
-		}
-		if (e.getSource() == attach) {			
-			JFrame fileChooser = new JFrame();
-			fileChooser.setSize(700, 500);
-			fc = new JFileChooser();
-			fileChooser.add(fc);
-			fileChooser.setVisible(false);
-			fc.addChoosableFileFilter(Constants.docFilter);
-			fc.addChoosableFileFilter(Constants.pdfFilter);
-			fc.addChoosableFileFilter(Constants.xlsFilter);
-			fc.addChoosableFileFilter(Constants.jpgFilter);
-
-			int result = fc.showOpenDialog(this);
-			if (result == JFileChooser.APPROVE_OPTION) {
-				fileChooser.dispatchEvent(new WindowEvent(fileChooser, WindowEvent.WINDOW_CLOSING));
-				File file = fc.getSelectedFile();
-				Encoder encoder = new Encoder(file.getPath());
-				conn.sendFile(new FilePacket(file.getName(), encoder.encode()));
-				appendText(client.getLocalAddress() + " sent the file: " + file.getName() + System.lineSeparator());
-//				String typedtext = message.getText();
-//				message.setText(typedtext + " " + fc.getSelectedFile().toString());
-//				if (fc.getSelectedFile().toString().substring(fc.getSelectedFile().toString().lastIndexOf("."),
-//						fc.getSelectedFile().toString().length()) == ".jpg") {
-//					message.insertIcon(new ImageIcon());
-//				}
-//				System.out.println(fc.getSelectedFile().toString().substring(
-//						fc.getSelectedFile().toString().lastIndexOf("."), fc.getSelectedFile().toString().length()));
-			}
 		}
 	}
 
@@ -199,50 +177,6 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		texta.setCaretPosition(texta.getDocument().getLength());
 	}
 	
-	@Override
-	public void windowActivated(WindowEvent arg0) {
-		getNotification = false;
-		// TODO Auto-generated catch block
-	}
-
-	@Override
-	public void windowClosed(WindowEvent arg0) {
-		getNotification = false;
-		// TODO Auto-generated catch block
-	}
-
-	@Override
-	public void windowClosing(WindowEvent arg0) {
-		client.getGUI().removePGUI(this.conn.other);
-		this.conn.stop();
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent arg0) {
-		getNotification = true;
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowDeiconified(WindowEvent arg0) {
-		getNotification = false;
-		// TODO Auto-generated catch block
-	}
-
-	@Override
-	public void windowIconified(WindowEvent arg0) {
-		getNotification = true;
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowOpened(WindowEvent arg0) {
-		getNotification = false;
-		// TODO Auto-generated catch block
-	}
-	
 	@SuppressWarnings("serial")
 	public class shiftEnter extends AbstractAction{
 		@Override
@@ -258,6 +192,111 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		@Override
 		public void actionPerformed(ActionEvent e) {
 				send.doClick();	
+		}
+	};
+	
+	public class PrivateGUIController implements WindowListener, ActionListener, DocumentListener{
+		private PrivateGUI privateGUI;
+		
+		public PrivateGUIController(PrivateGUI privateGUI) {
+			this.privateGUI = privateGUI;
+		}
+		
+		@Override
+		public void windowActivated(WindowEvent arg0) {
+			getNotification = false;
+		}
+
+		@Override
+		public void windowClosed(WindowEvent arg0) {
+			getNotification = false;
+		}
+
+		@Override
+		public void windowClosing(WindowEvent arg0) {
+			client.getGUI().removePGUI(conn.other);
+			conn.stop();
+		}
+
+		@Override
+		public void windowDeactivated(WindowEvent arg0) {
+			getNotification = true;
+		}
+
+		@Override
+		public void windowDeiconified(WindowEvent arg0) {
+			getNotification = false;
+		}
+
+		@Override
+		public void windowIconified(WindowEvent arg0) {
+			getNotification = true;
+		}
+
+		@Override
+		public void windowOpened(WindowEvent arg0) {
+			getNotification = false;
+		}
+		/**
+		 * Checks if an action in the GUI has taken place and does an appropriate follow-up
+		 */
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() == send && (!message.getText().isEmpty())) {
+				sendMessage(message.getText());
+			}
+			if (e.getSource() == attach) {			
+				JFrame fileChooser = new JFrame();
+				fileChooser.setSize(700, 500);
+				fc = new JFileChooser();
+				fileChooser.add(fc);
+				fileChooser.setVisible(false);
+				fc.addChoosableFileFilter(Constants.docFilter);
+				fc.addChoosableFileFilter(Constants.pdfFilter);
+				fc.addChoosableFileFilter(Constants.xlsFilter);
+				fc.addChoosableFileFilter(Constants.jpgFilter);
+
+				int result = fc.showOpenDialog(privateGUI);
+				if (result == JFileChooser.APPROVE_OPTION) {
+					fileChooser.dispatchEvent(new WindowEvent(fileChooser, WindowEvent.WINDOW_CLOSING));
+					File file = fc.getSelectedFile();
+					Encoder encoder = new Encoder(file.getPath());
+					conn.sendFile(new FilePacket(file.getName(), encoder.encode()));
+					appendText(client.getLocalAddress() + " sent the file: " + file.getName() + System.lineSeparator());
+//					String typedtext = message.getText();
+//					message.setText(typedtext + " " + fc.getSelectedFile().toString());
+//					if (fc.getSelectedFile().toString().substring(fc.getSelectedFile().toString().lastIndexOf("."),
+//							fc.getSelectedFile().toString().length()) == ".jpg") {
+//						message.insertIcon(new ImageIcon());
+//					}
+//					System.out.println(fc.getSelectedFile().toString().substring(
+//							fc.getSelectedFile().toString().lastIndexOf("."), fc.getSelectedFile().toString().length()));
+				}
+			}
+		}
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			disableButtonIfEmpty(e);
+			disaleButtonIfConnectionDown(e);
+		}
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			disableButtonIfEmpty(e);
+			disaleButtonIfConnectionDown(e);
+		}
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			disableButtonIfEmpty(e);	
+			disaleButtonIfConnectionDown(e);
+		}
+		
+		public void disableButtonIfEmpty(DocumentEvent e) {
+			send.setEnabled(e.getDocument().getLength() > 0);
+		}
+		
+		public void disaleButtonIfConnectionDown(DocumentEvent e) {
+			if(hasConnection = false) {
+				send.setEnabled(false);
+			}
 		}
 	};
 }
