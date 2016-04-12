@@ -1,7 +1,5 @@
 package gui;
-/**
- * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
- */
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -15,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Date;
-import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -27,13 +24,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
-import javax.swing.filechooser.FileFilter;
 
 import helper.AudioPlayer;
 import helper.Constants;
 import main.Client;
 import network.SingleConnection;
 
+/**
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
+ */
 public class PrivateGUI extends JPanel implements ActionListener, WindowListener {
 
 	private static final long serialVersionUID = 6883134327632102722L;
@@ -50,7 +49,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 	
 	/**
 	 * Constructor of the Private GUI
-	 * @param client the user of the program
+	 * @param client the client
 	 * @param me the IP4 address of the user of the program
 	 * @param conn The connection between two clients
 	 * @param pGUIs 
@@ -59,18 +58,6 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		flickicon = new FlickIcon(this);
 		this.client = client;
 		this.conn = conn;
-		frame = new JFrame(conn.other.toString());
-		frame.addWindowListener(this);
-		this.setBackground(Color.WHITE);
-		frame.setContentPane(this);
-		frame.setSize(700, 500);
-		frame.setVisible(true);
-		try {
-			frame.setIconImage(ImageIO.read(new File("msn.png")));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		buildGUI();
 	}
 	
@@ -112,6 +99,19 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		attach = new JButton("attach");
 		attach.addActionListener(this);
 		add(attach);
+		
+		frame = new JFrame(conn.other.toString());
+		frame.addWindowListener(this);
+		this.setBackground(Color.WHITE);
+		frame.setContentPane(this);
+		frame.setSize(700, 500);
+		frame.setVisible(true);
+		try {
+			frame.setIconImage(ImageIO.read(new File("msn.png")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -202,7 +202,6 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		System.out.println("hoi");
 		client.getGUI().removePGUI(this.conn.other);
 		this.conn.stop();
 	}
