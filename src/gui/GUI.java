@@ -110,6 +110,7 @@ public class GUI extends JPanel{
 		message.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "sendText");
 		message.getActionMap().put("sendText", new sendText());
 		Document document = message.getDocument();
+		document.addDocumentListener(guiController);
 		
 		JScrollPane scrollMessage = new JScrollPane(message);
 		scrollMessage.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -118,6 +119,7 @@ public class GUI extends JPanel{
 		add(scrollMessage);
 
 		send = new JButton("send");
+		send.setEnabled(false);
 		send.addActionListener(guiController);
 		send.setPreferredSize(new Dimension(170, 100));
 		add(send);
@@ -283,8 +285,8 @@ public class GUI extends JPanel{
 
 		@Override
 		public void windowClosing(WindowEvent arg0) {
-			client.stop();
-			// TODO Auto-generated method stub
+		//	client.stop();
+		// TODO Auto-generated method stub
 		}
 
 		@Override
@@ -313,17 +315,20 @@ public class GUI extends JPanel{
 		
 		@Override
 		public void changedUpdate(DocumentEvent e) {
-			
+			disableButtonIfEmpty(e);
 		}
 		@Override
 		public void insertUpdate(DocumentEvent e) {
-			// TODO Auto-generated method stub
+			disableButtonIfEmpty(e);
 			
 		}
 		@Override
 		public void removeUpdate(DocumentEvent e) {
-			// TODO Auto-generated method stub
-			
-		};
+			disableButtonIfEmpty(e);	
+		}
+		
+		public void disableButtonIfEmpty(DocumentEvent e) {
+			send.setEnabled(e.getDocument().getLength() > 0);
+		}
 	};
 }
