@@ -50,7 +50,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	private JTextPane texta, message;
 	private JList<InetAddress> users;
 	private JScrollPane scrollUsers;
-	public DefaultListModel<InetAddress> userList = new DefaultListModel<InetAddress>();
+	private DefaultListModel<InetAddress> userList = new DefaultListModel<InetAddress>();
 	private JButton send;
 	private JButton attach;
 	private HashMap<InetAddress, PrivateGUI> pGUIs = new HashMap<InetAddress, PrivateGUI>();
@@ -129,7 +129,6 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	    try {
 	    	frame.setIconImage(ImageIO.read(new File("msn.png")));
 		} catch (IOException e) {
-			//TODO remove stack trace
 			e.printStackTrace();
 		}
 	}
@@ -152,6 +151,11 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		return pGUIs;
 	}
 
+	public DefaultListModel<InetAddress> getUserList() {
+		return userList;
+	}
+	
+	
 	/**
 	 * Checks if an action in the GUI has taken place and does an appropriate follow-up
 	 */
