@@ -1,7 +1,5 @@
 package main;
 
-import java.awt.Color;
-import java.io.File;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
@@ -146,10 +144,10 @@ public class Client implements Observer {
 	}
 	
 	public void update(Observable arg0, Object arg1) {
-		gui.userList.removeAllElements();
+		gui.getUserList().removeAllElements();
 		for(InetAddress address : routingTable.keySet()) {
 //			if(!address.equals(getLocalAddress())) {
-				gui.userList.addElement(address);
+				gui.getUserList().addElement(address);
 				gui.setGroupConnections();
 //			}
 	     }
