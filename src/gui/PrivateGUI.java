@@ -142,25 +142,28 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 
 			int result = fc.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION) {
-				System.out.println("File opened");
-				System.out.println(fc.getSelectedFile());
 				fileChooser.dispatchEvent(new WindowEvent(fileChooser, WindowEvent.WINDOW_CLOSING));
-				String typedtext = message.getText();
-				message.setText(typedtext + " " + fc.getSelectedFile().toString());
-				// System.out.println(fc.getSelectedFile().getParent());
-				System.out.println(fc.getSelectedFile().getName() + "is verzonden");
-				if (fc.getSelectedFile().toString().substring(fc.getSelectedFile().toString().lastIndexOf("."),
-						fc.getSelectedFile().toString().length()) == ".jpg") {
-					message.insertIcon(new ImageIcon());
-				}
-				System.out.println(fc.getSelectedFile().toString().substring(
-						fc.getSelectedFile().toString().lastIndexOf("."), fc.getSelectedFile().toString().length()));
-			} else if (result == JFileChooser.CANCEL_OPTION) {
-				System.out.println("Open file was canceled.");
+				String filename = fc.getSelectedFile().toString();
+				Encoder encoder = new Encoder(filename);
+				conn.sendFile(encoder.encode());
+				appendText(client.getLocalAddress() + " sent the file: " + filename);
+//				String typedtext = message.getText();
+//				message.setText(typedtext + " " + fc.getSelectedFile().toString());
+//				if (fc.getSelectedFile().toString().substring(fc.getSelectedFile().toString().lastIndexOf("."),
+//						fc.getSelectedFile().toString().length()) == ".jpg") {
+//					message.insertIcon(new ImageIcon());
+//				}
+//				System.out.println(fc.getSelectedFile().toString().substring(
+//						fc.getSelectedFile().toString().lastIndexOf("."), fc.getSelectedFile().toString().length()));
 			}
 		}
 	}
 
+	public void appendText(String text) {
+		String oldText = texta.getText();
+		texta.setText(oldText + text);
+	}
+	
 	/**
 	 * Sends the message to another user.
 	 * @param text the text typed in by the users in the JTextPane

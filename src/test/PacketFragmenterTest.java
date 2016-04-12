@@ -3,7 +3,7 @@ package test;
 import java.net.InetAddress;
 import java.util.List;
 
-import gui.Decoder;
+import gui.Encoder;
 import helper.Packet;
 import helper.PacketFragmenter;
 
@@ -22,8 +22,6 @@ public class PacketFragmenterTest {
 	}
 	
 	public void makeMegaPacket() {
-		Decoder decode = new Decoder("bigfile.txt");
-		big = decode.decode();
 	}
 	
 	public void testFragments() {

@@ -1,26 +1,38 @@
 package gui;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Decoder {
-	private String filename;
+	private static final String DOWNLOAD_PATH = "Download";
+	private byte[] filebytes;
 	
-	public Decoder(String file){
-		filename=file;
+	public Decoder(byte[] bytes){
+		filebytes = bytes;
 	}
 	
-	public byte[] decode(){
-		Path path = Paths.get(filename);
-		byte[] data = null;
+	public void decode(String filename) {
+		FileOutputStream fos =null;
 		try {
-			data = Files.readAllBytes(path);
+			fos = new FileOutputStream(DOWNLOAD_PATH + File.pathSeparator + filename);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			fos.write(filebytes);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return data;
+		try {
+			fos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+
 }

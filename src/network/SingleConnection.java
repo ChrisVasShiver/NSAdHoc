@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import gui.Decoder;
 import helper.DistanceVectorEntry;
 import helper.Helper;
 import helper.Packet;
@@ -79,6 +80,14 @@ public class SingleConnection implements Observer {
 		addPackets(packets);
 	}
 
+	public void sendFile(byte[] data) {
+		byte[] encryptedData = hybridEnc.encryptMessage(data);
+		Packet header = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.FILE, System.currentTimeMillis(),
+				0, 0, null);
+		List<Packet> packets = PacketFragmenter.getPackets(header, encryptedData);
+		addPackets(packets);
+	}
+	
 	public void sendSYN() {
 		Packet packet = new Packet(client.getLocalAddress(), other, lastSeqnr, 0, Packet.Flags.SYN,
 				System.currentTimeMillis(), 0, 0, null);
@@ -155,6 +164,8 @@ public class SingleConnection implements Observer {
 			client.stopPrivateGUI(packet.getSrc());
 			sendACK(packet);
 			break;
+		case Packet.Flags.FILE_FRG:
+		case Packet.Flags.FILE_LST:
 		case Packet.Flags.FRG:
 		case Packet.Flags.LST:
 			HashMap<Integer, Packet> packets = buffer.get(packet.getPacketID());
@@ -169,8 +180,20 @@ public class SingleConnection implements Observer {
 				flushBuffer(packet.getPacketID());
 			sendACK(packet);
 			break;
+		case Packet.Flags.FILE:
+			if (lastPacketReceived != packet.getSeqNr()) {
+				String message = packet.getSrc().getHostName() + " (" + new Date(packet.getTimeStamp()) + ") sent a file: ";
+				byte[] decryptedMessage = hybridEnc.decryptMessage(packet.getData());
+				Decoder decoder = new Decoder(decryptedMessage);
+				decoder.decode("file"+packet.getTimeStamp());
+				client.messageReceived(packet.getSrc(), message);
+				lastPacketReceived = packet.getSeqNr();
+			} 
+			sendACK(packet);
+			break;
 		default:
 			if (lastPacketReceived != packet.getSeqNr()) {
+				
 				String message = packet.getSrc().getHostName() + " (" + new Date(packet.getTimeStamp()) + "):"
 						+ System.lineSeparator() + " ";
 				byte[] decryptedMessage = hybridEnc.decryptMessage(packet.getData());
@@ -200,13 +223,21 @@ public class SingleConnection implements Observer {
 			for(byte b : packet.getData())
 			rawMessage.add(b);
 		Packet header = buffer.get(ID).get(0);
-		String message = header.getSrc().getHostName() + " (" + new Date(header.getTimeStamp()) + "):"
-				+ System.lineSeparator() + " ";
-		byte[] decryptedMessage = hybridEnc.decryptMessage(Helper.byteListToArray(rawMessage));
-		message += Packet.dataToString(decryptedMessage);
+		String message = "";
+		if(header.getFlag() == Packet.Flags.FILE_FRG || header.getFlag() == Packet.Flags.FILE_LST) {
+			message += header.getSrc().getHostName() + " (" + new Date(header.getTimeStamp()) + ") sent a file: ";
+			byte[] decryptedMessage = hybridEnc.decryptMessage(Helper.byteListToArray(rawMessage));
+			Decoder decoder = new Decoder(decryptedMessage);
+			decoder.decode("file"+header.getTimeStamp());
+		} else {
+			message += header.getSrc().getHostName() + " (" + new Date(header.getTimeStamp()) + "):"
+					+ System.lineSeparator() + " ";
+			byte[] decryptedMessage = hybridEnc.decryptMessage(Helper.byteListToArray(rawMessage));
+			message += Packet.dataToString(decryptedMessage);
+		}
 		client.messageReceived(header.getSrc(), message);
 	}
-
+	
 	public void sendACK(Packet packet) {
 		Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(), 0, packet.getSeqNr(), (byte) 0x01,
 				System.currentTimeMillis(), 0, 0, null);

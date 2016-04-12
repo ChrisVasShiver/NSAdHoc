@@ -1,37 +1,26 @@
 package gui;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Encoder {
-	private byte[] filebytes;
+	private String filename;
 	
-	public Encoder(byte[] bytes){
-		filebytes = bytes;
-		encode();
+	public Encoder(String file){
+		filename=file;
 	}
 	
-	public void encode(){
-		FileOutputStream fos =null;
+	public byte[] encode(){
+		Path path = Paths.get(filename);
+		byte[] data = null;
 		try {
-			fos = new FileOutputStream("pathname");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			fos.write(filebytes);
+			data = Files.readAllBytes(path);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		try {
-			fos.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return data;
 	}
-
 }

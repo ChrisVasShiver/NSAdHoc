@@ -11,9 +11,11 @@ public class Packet implements Comparable<Packet> {
 		public final static byte SYN = 0x02; // Synchronize
 		public final static byte SYN_ACK = 0x03;
 		public final static byte FIN = 0x04; // Finish
-		public final static byte GRP = 0x08; // Group
+		public final static byte FILE = 0x08; // File packet
 		public final static byte FRG = 0x10; // Fragmented
 		public final static byte LST = 0x20; // Last fragment
+		public final static byte FILE_FRG = 0x18;
+		public final static byte FILE_LST = 0x28;
 	}
 
 	public final static int HEADER_SIZE = 42;
