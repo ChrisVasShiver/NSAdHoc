@@ -14,12 +14,18 @@ public class Decoder {
 	}
 	
 	public void decode(String filename) {
+		File downloadDir = new File(DOWNLOAD_PATH);
+		if(!downloadDir.exists())
+			try {
+				downloadDir.mkdir();
+			} catch (SecurityException e) {
+				System.out.println("Could not create the directory " + downloadDir.getPath());
+			}
 		FileOutputStream fos =null;
 		try {
 			fos = new FileOutputStream(DOWNLOAD_PATH + File.separator + filename);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
 		}
 		try {
 			fos.write(filebytes);

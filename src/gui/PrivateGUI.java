@@ -143,10 +143,10 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 			int result = fc.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION) {
 				fileChooser.dispatchEvent(new WindowEvent(fileChooser, WindowEvent.WINDOW_CLOSING));
-				String filename = fc.getSelectedFile().getName();
-				Encoder encoder = new Encoder(filename);
-				conn.sendFile(new FilePacket(filename, encoder.encode()));
-				appendText(client.getLocalAddress() + " sent the file: " + filename);
+				File file = fc.getSelectedFile();
+				Encoder encoder = new Encoder(file.getPath());
+				conn.sendFile(new FilePacket(file.getName(), encoder.encode()));
+				appendText(client.getLocalAddress() + " sent the file: " + file.getName());
 //				String typedtext = message.getText();
 //				message.setText(typedtext + " " + fc.getSelectedFile().toString());
 //				if (fc.getSelectedFile().toString().substring(fc.getSelectedFile().toString().lastIndexOf("."),
