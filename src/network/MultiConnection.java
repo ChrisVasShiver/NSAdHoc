@@ -19,16 +19,16 @@ public class MultiConnection {
 
 
 	public void setConnections() {
-		connections.clear();
-		for(InetAddress address : client.routingTable.keySet()) {
-			if(!client.getLocalAddress().equals(address))
-				connections.add(new SingleConnection(this.client, address, true));
-		}
+//		connections.clear();
+//		for(InetAddress address : client.routingTable.keySet()) {
+//			if(!client.getLocalAddress().equals(address))
+//				connections.add(new SingleConnection(this.client, address, true));
+//		}
 	}
 	
 	public void sendMessage(String message) {
-		for(SingleConnection conn : connections) {
-			conn.sendMessage(message);
-		}
+//		for(SingleConnection conn : connections) {
+//			conn.sendMessage(message);
+//		}
 	}
 }
