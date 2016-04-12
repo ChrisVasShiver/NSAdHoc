@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.util.Observable;
 import java.util.Observer;
 
+import helper.Constants;
 import helper.Packet;
 import main.Client;
 import network.MultiConnection;
@@ -23,7 +24,7 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 	public void run() {
 		while (wait) {
 
-			byte[] buffer = new byte[Client.MAX_PACKET_SIZE];
+			byte[] buffer = new byte[Constants.MAX_PACKET_SIZE];
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
 				client.getUniSocket().receive(recvPacket);
@@ -63,7 +64,7 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 			if(!packet.isExpired()) {
 				packet.decreaseTTL();
 				DatagramPacket pkt = new DatagramPacket(packet.getBytes(), packet.getBytes().length,
-						client.routingTable.get(packet.getDest()).nextHop, client.uniPort);
+						client.routingTable.get(packet.getDest()).nextHop, Constants.UNI_SOCKET_PORT);
 				try {
 					client.getUniSocket().send(pkt);
 				} catch (IOException e) { e.printStackTrace(); }

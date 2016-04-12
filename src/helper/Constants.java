@@ -15,4 +15,10 @@ public interface Constants {
 	//TODO add constants from classes
 	
 	public static final String[] SONGS = {"newmsg.wav"};
+
+	public static final int MULTI_SOCKET_PORT = 6789;
+	public static final int UNI_SOCKET_PORT = 7000;
+	public static final int PACKET_TIMEOUT = 3000;
+	public static final int MAX_PACKET_SIZE = 1024;
+	
 }

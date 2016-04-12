@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
+import helper.Constants;
 import helper.DistanceVectorEntry;
 import main.Client;
 
@@ -79,7 +80,7 @@ public class MultiListeningThread implements Runnable {
 		}
 	}
 	
-	private synchronized void printRoutingTable() {
+	public synchronized void printRoutingTable() {
 		System.out.println("Routing Table: ");
 		for(InetAddress address : client.routingTable.keySet()) 
 			System.out.println(client.routingTable.get(address).toString());
@@ -88,7 +89,7 @@ public class MultiListeningThread implements Runnable {
 	private void checkTimeoutElapsed() {
 		for(InetAddress address : client.neighbourTimeout.keySet()) {
 			long now = System.currentTimeMillis();
-			if(now - client.neighbourTimeout.get(address) > 3 * Client.sendTimeout) {
+			if(now - client.neighbourTimeout.get(address) > 3 * Constants.PACKET_TIMEOUT) {
 				removeEntries(address);
 			}
 		}

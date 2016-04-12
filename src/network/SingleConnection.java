@@ -11,6 +11,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import gui.Decoder;
+import helper.Constants;
 import helper.DistanceVectorEntry;
 import helper.FilePacket;
 import helper.Helper;
@@ -153,7 +154,7 @@ public class SingleConnection implements Observer {
 		Packet ackpkt = new Packet(client.getLocalAddress(), packet.getSrc(), 0, packet.getSeqNr(), (byte) 0x01,
 				System.currentTimeMillis(), 0, 0, null);
 		DatagramPacket pkt = new DatagramPacket(ackpkt.getBytes(), ackpkt.getBytes().length,
-				client.routingTable.get(ackpkt.getDest()).nextHop, client.uniPort);
+				client.routingTable.get(ackpkt.getDest()).nextHop, Constants.UNI_SOCKET_PORT);
 		try {
 			client.getUniSocket().send(pkt);
 		} catch (IOException e) {}
@@ -170,7 +171,7 @@ public class SingleConnection implements Observer {
 			return;
 		}
 		DatagramPacket dpack = new DatagramPacket(packet.getBytes(), packet.getBytes().length, dve.nextHop,
-				client.uniPort);
+				Constants.UNI_SOCKET_PORT);
 		try {
 			client.getUniSocket().send(dpack);
 		} catch (IOException e) { }

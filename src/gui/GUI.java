@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;

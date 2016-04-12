@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import gui.GUI;
 import gui.PrivateGUI;
+import helper.Constants;
 import helper.DistanceVectorEntry;
 import helper.RoutingTable;
 import threads.DistanceVectorThread;
@@ -40,18 +41,13 @@ public class Client implements Observer {
 	private DatagramSocket uniSocket;
 	private InetAddress group;
 
-	public static final int multiPort = 6789;
-	public static final int uniPort = 7000;
-	public static final int sendTimeout = 3000;
-	public static final int MAX_PACKET_SIZE = 1024;
-	
 	public Client() {
 		routingTable.addObserver(this);
 		try {
 			group = InetAddress.getByName("228.0.0.2");
-			multiSocket = new MulticastSocket(multiPort);
+			multiSocket = new MulticastSocket(Constants.MULTI_SOCKET_PORT);
 			multiSocket.joinGroup(group);
-			uniSocket = new DatagramSocket(uniPort);
+			uniSocket = new DatagramSocket(Constants.UNI_SOCKET_PORT);
 		} catch (IOException e) { System.out.println("Could not start the client, try restarting");}
 		InetAddress localAddress = getLocalAddress();
 		DistanceVectorEntry defaultEntry = new DistanceVectorEntry(localAddress, 0, localAddress);

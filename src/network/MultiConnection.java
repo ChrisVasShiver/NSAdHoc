@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 
+import helper.Constants;
 import helper.DistanceVectorEntry;
 import helper.Packet;
 import main.Client;
@@ -61,7 +62,7 @@ public class MultiConnection implements Observer {
 			return;
 		}
 		DatagramPacket dpack = new DatagramPacket(packet.getBytes(), packet.getBytes().length, dve.nextHop,
-				client.uniPort);
+				Constants.UNI_SOCKET_PORT);
 		try {
 			client.getUniSocket().send(dpack);
 		} catch (IOException e) { }

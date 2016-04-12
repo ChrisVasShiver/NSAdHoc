@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 
+import helper.Constants;
 import helper.DistanceVectorEntry;
 import main.Client;
 
@@ -21,7 +22,7 @@ public class DistanceVectorThread implements Runnable {
 		while(wait) {
 			try {
 				client.getMultiSocket().send(getDatagramPacket());
-				Thread.sleep(Client.sendTimeout);
+				Thread.sleep(Constants.PACKET_TIMEOUT);
 			} catch (InterruptedException | IOException e) { }
 		}
 	}
@@ -34,7 +35,7 @@ public class DistanceVectorThread implements Runnable {
 			System.arraycopy(dv.getBytes(), 0, rawPacket, index, DistanceVectorEntry.SIZE);
 			index += DistanceVectorEntry.SIZE;
 		}
-		DatagramPacket packet = new DatagramPacket(rawPacket, rawPacket.length, client.getGroup(), client.multiPort);
+		DatagramPacket packet = new DatagramPacket(rawPacket, rawPacket.length, client.getGroup(), Constants.MULTI_SOCKET_PORT);
 		return packet;
 
 	}

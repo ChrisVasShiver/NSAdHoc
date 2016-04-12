@@ -3,7 +3,6 @@ package test;
 import java.net.InetAddress;
 import java.util.List;
 
-import gui.Encoder;
 import helper.Packet;
 import helper.PacketFragmenter;
 

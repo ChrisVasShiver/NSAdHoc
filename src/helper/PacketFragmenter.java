@@ -2,8 +2,6 @@ package helper;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import main.Client;
 /**
  * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher 
  */
@@ -16,7 +14,7 @@ public class PacketFragmenter {
 	 */
 	public static List<Packet> getPackets(Packet header, byte[] data) {
 		List<Packet> packets = new ArrayList<Packet>();
-		int maxDataSize = Client.MAX_PACKET_SIZE - Packet.HEADER_SIZE;
+		int maxDataSize = Constants.MAX_PACKET_SIZE - Packet.HEADER_SIZE;
 		if(data.length > maxDataSize) {
 			int nrOfPackets = (int)Math.ceil(data.length / (double)maxDataSize);
 			for(int i = 0; i < nrOfPackets; i++) {
