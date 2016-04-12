@@ -31,9 +31,11 @@ public class SingleConnection implements Observer {
 	private int lastPacketID = 1;
 	private int lastPacketReceived = 0;
 	private final int SWS = 10;
+	private final int RWS = 10;
 	private List<Packet> queue = new ArrayList<Packet>();
 	private HashMap<Integer, HashMap<Integer, Packet>> buffer = new HashMap<Integer, HashMap<Integer, Packet>>();
 	private List<Packet> sentWindow = new ArrayList<Packet>();
+	private HashMap<Integer, Packet> receiveBuffer = new HashMap<Integer, Packet>();
 	private HybridEncryption hybridEnc;
 	
 	public SingleConnection(Client client, InetAddress other) {
@@ -196,20 +198,33 @@ public class SingleConnection implements Observer {
 			sendACK(packet);
 			break;
 		default:
-			if (lastPacketReceived != packet.getSeqNr()) {
-				
+			if (packet.getSeqNr() < lastPacketReceived + RWS) {
+				sendACK(packet);
+				if(packet.getSeqNr() > lastPacketReceived) {
+					receiveBuffer.put(packet.getSeqNr(), packet);
+					if(packet.getSeqNr() == lastPacketReceived + 1)
+						flushReceiveWindow();
+				}
+			} 
+			break;
+		}
+	}
+
+	private void flushReceiveWindow() {
+		for(Integer seq : receiveBuffer.keySet()) {
+			if(seq.equals(lastPacketReceived + 1)) {
+				Packet packet = receiveBuffer.remove(seq);
 				String message = packet.getSrc().getHostName() + " (" + new Date(packet.getTimeStamp()) + "):"
 						+ System.lineSeparator() + " ";
 				byte[] decryptedMessage = hybridEnc.decryptMessage(packet.getData());
 				message += Packet.dataToString(decryptedMessage);
 				client.messageReceived(packet.getSrc(), message);
-				lastPacketReceived = packet.getSeqNr();
-			} 
-			sendACK(packet);
-			break;
+				lastPacketReceived = seq;
+			} else 
+				break;
 		}
 	}
-
+	
 	private boolean checkBuffer(Integer ID) {
 		HashMap<Integer, Packet> packets = buffer.get(ID);
 		for (int i = 0; i < packets.size(); i++) {

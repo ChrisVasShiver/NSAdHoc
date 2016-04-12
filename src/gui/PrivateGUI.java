@@ -146,7 +146,7 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 				File file = fc.getSelectedFile();
 				Encoder encoder = new Encoder(file.getPath());
 				conn.sendFile(new FilePacket(file.getName(), encoder.encode()));
-				appendText(client.getLocalAddress() + " sent the file: " + file.getName());
+				appendText(client.getLocalAddress() + " sent the file: " + file.getName() + System.lineSeparator());
 //				String typedtext = message.getText();
 //				message.setText(typedtext + " " + fc.getSelectedFile().toString());
 //				if (fc.getSelectedFile().toString().substring(fc.getSelectedFile().toString().lastIndexOf("."),
