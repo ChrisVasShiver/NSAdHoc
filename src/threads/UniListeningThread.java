@@ -29,6 +29,7 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 			} catch (IOException e) {e.printStackTrace();}
 			Packet pkt = null;
 			try {
+				System.out.println(buffer[25]);
 				pkt = new Packet(buffer);
 			} catch (UnknownHostException | ArrayIndexOutOfBoundsException e) { e.printStackTrace();continue; }
 			if(pkt != null) {
@@ -42,6 +43,8 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 		if(packet == null)
 			return;
 
+		System.out.println(packet.getTTL());
+		System.out.println(packet.isExpired());
 		if(packet.getDest().equals(client.getLocalAddress())) {
 			if(packet.getFlag() == Packet.Flags.SYN) 
 				client.startPrivateGUI(packet.getSrc());
@@ -59,7 +62,6 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 				try {
 					client.uniSocket.send(pkt);
 				} catch (IOException e) { e.printStackTrace(); }
-				System.out.println("Packet resend");
 			}
 		}
 	}
