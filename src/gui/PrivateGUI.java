@@ -16,7 +16,6 @@ import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -27,6 +26,7 @@ import javax.swing.KeyStroke;
 
 import helper.AudioPlayer;
 import helper.Constants;
+import helper.FilePacket;
 import main.Client;
 import network.SingleConnection;
 
@@ -143,9 +143,9 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 			int result = fc.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION) {
 				fileChooser.dispatchEvent(new WindowEvent(fileChooser, WindowEvent.WINDOW_CLOSING));
-				String filename = fc.getSelectedFile().toString();
+				String filename = fc.getSelectedFile().getName();
 				Encoder encoder = new Encoder(filename);
-				conn.sendFile(encoder.encode());
+				conn.sendFile(new FilePacket(filename, encoder.encode()));
 				appendText(client.getLocalAddress() + " sent the file: " + filename);
 //				String typedtext = message.getText();
 //				message.setText(typedtext + " " + fc.getSelectedFile().toString());
