@@ -5,7 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
-public class Packet {
+public class Packet implements Comparable<Packet> {
 	public class Flags {
 		public final static byte ACK = 0x01; // Acknowledgement
 		public final static byte SYN = 0x02; // Synchronize
@@ -64,11 +64,6 @@ public class Packet {
 		}
 	}
 	
-	/**
-	 * Creates a packet based upon received bytes of another client
-	 * @param raw the bytes received from another client
-	 * @throws UnknownHostException if an address does not exist it throws an exception.
-	 */
 	public Packet(byte[] raw) throws UnknownHostException {
 		byte[] src = new byte[4];
 		byte[] dest = new byte[4];
@@ -105,10 +100,7 @@ public class Packet {
 		}
 	}
 	
-	/**
-	 * Turns the complete(read: all the values of the) package into a array of bytes
-	 * @return  an array of bytes that represent this package
-	 */
+	
 	public byte[] getBytes() {
 		byte[] result = new byte[HEADER_SIZE + dataL];
 		System.arraycopy(src.getAddress(),  0, result, 0, 4);
@@ -127,10 +119,6 @@ public class Packet {
 		return result;
 	}
 	
-	/**
-	 * Makes a copy of the header of a packages
-	 * @return the copy of the header of a package
-	 */
 	public Packet copyHeader() {
 		Packet result = new Packet(this.src, this.dest, this.seqNr, this.ackNr, this.flag, this.timeStamp,
 				this.fragmentNr, this.offset, null);
@@ -160,205 +148,121 @@ public class Packet {
 		return result;
 	}
 	
-	/**
-	 * checks if the package is expired
-	 * @return true if the packages is expired; false if the package is not expired
-	 */
 	public boolean isExpired() {
 		return TTL==0;
 	}
 	
-	/**
-	 * Decrease the TTL by 1;
-	 */
 	public void decreaseTTL() {
 		System.out.println("Decrease TLL");
 		TTL--;
 	}
 	
-	/**
-	 * get the source address of this package
-	 * @return InetAddress that represents the source of the package
-	 */
 	public InetAddress getSrc() {
 		return src;
 	}
 
-	/**
-	 * set the source address of this package
-	 * @param src the InetAddress of the source of this package
-	 */
 	public void setSrc(InetAddress src) {
 		this.src = src;
 	}
 
-	/**
-	 * get the destination address of the this package
-	 * @return InetAddress that represents the destination of this package
-	 */
 	public InetAddress getDest() {
 		return dest;
 	}
-	
-	/**
-	 * set the destination address of this package
-	 * @param dest the InetAddress of the destination of this package
-	 */
+
 	public void setDest(InetAddress dest) {
 		this.dest = dest;
 	}
 
-	/**
-	 * gets the sequence number of this package
-	 * @return an integer that represents the sequence number of this package
-	 */
 	public int getSeqNr() {
 		return seqNr;
 	}
-	
-	/**
-	 * sets the sequence number of this package
-	 * @param seqNr the new seqNr of the package
-	 */
+
 	public void setSeqNr(int seqNr) {
 		this.seqNr = seqNr;
 	}
-	
-	/**
-	 * gets the acknowledgement number of this package
-	 * @return an integer that represents the acknowledgement number of this package
-	 */
+
 	public int getAckNr() {
 		return ackNr;
 	}
 	
-	
-	/**
-	 * sets the acknowledgement number of this package
-	 * @param ackNr the new acknowledgement number of the package
-	 */
 	public void setAckNr(int ackNr) {
 		this.ackNr = ackNr;
 	}
-	
-	/**
-	 * get the flag of this package
-	 * @return a byte that represents the flag of this package
-	 */
+
 	public byte getFlag() {
 		return flag;
 	}
 	
-	/**
-	 * sets the flag of this package
-	 * @param flag the new byte that represents the flag of this package
-	 */
 	public void setFlag(byte flag) {
 		this.flag = flag;
 	}
 	
-	/**
-	 * gets the timeStamp of this package
-	 * @return a long that represents the timeStamp of this package
-	 */
 	public long getTimeStamp() {
 		return timeStamp;
 	}
-	
-	/**
-	 * sets the timeStamp of this package
-	 * @param timeStamp a long that represents the timeStamp of this package
-	 */
+
 	public void setTimeStamp(long timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
-	/**
-	 * gets the time-to-live(TTL) of the package
-	 * @return an integer that represents the TTL
-	 */
 	public int getTTL() {
 		return TTL;
 	}
-	
-	/**
-	 * sets the time-to-live(TTL) of the package
-	 * @param TTL an integer that represents the TTL.
-	 */
-	public void setTTL(int TTL) {
-		this.TTL = TTL;
+
+	public void setTTL(int tTL) {
+		TTL = tTL;
 	}
-	
-	/**
-	 * gets the packetID number
-	 * @return an integer that represents the packetID number
-	 */
+
 	public int getPacketID() {
 		return packetNumber;
 	}
 	
-	/**
-	 * sets the PacketID of this package
-	 * @param ID an integer that represents the new packageID
-	 */
 	public void setPacketID(int ID) {
 		packetNumber = ID;
 	}
-	
-	/**
-	 * get the data length of this package.
-	 * @return an integer that represents the data length in bytes of this package.
-	 */
 	public int getDataL() {
 		return dataL;
 	}
 
-	/**
-	 * get the data of this package in bytes
-	 * @return an byte array that represents the data of this package.
-	 */
 	public byte[] getData() {
 		return data;
 	}
 
-	/**
-	 * set the data of this package
-	 * @param data an byte array that represents the new data of this package.
-	 */
 	public void setData(byte[] data) {
 		this.dataL = data.length;
 		this.data = data;
 	}
-	
-	/**
-	 * get the Fragment number of this package
-	 * @return an integer that represents the framgent number of this package
-	 */
+
 	public int getFragmentNr() {
 		return fragmentNr;
 	}
 
-	/**
-	 * sets the framgent number of this package
-	 * @param fragmentNr an integer that represents the new fragment number of this package.
-	 */
 	public void setFragmentNr(int fragmentNr) {
 		this.fragmentNr = fragmentNr;
 	}
 
-	/**
-	 * gets the Offset of this package
-	 * @return an integer that represents the Offset of this package
-	 */
 	public int getOffset() {
 		return offset;
 	}
 
-	/**
-	 * sets the Offset of this package
-	 * @param offset an integer that represents the offset of this package
-	 */
 	public void setOffset(int offset) {
 		this.offset = offset;
 	}
+	
+	@Override
+	public String toString() {
+		return "Packet: " + getData();
+	}
+
+	@Override
+	public int compareTo(Packet other) {
+		if(other.getFragmentNr() < this.fragmentNr)
+			return -1;
+		else if(other.getFragmentNr() == this.fragmentNr)
+			return 0;
+		else
+			return 1;
+	}
+
+
 }
