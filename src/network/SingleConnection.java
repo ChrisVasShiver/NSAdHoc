@@ -143,6 +143,7 @@ public class SingleConnection implements Observer {
 	}
 
 	public void receiveMessage(Packet packet) {
+		System.out.println("Received packet: " + packet.getSeqNr() + " lastPacketReceived: " + lastPacketReceived);
 		if (packet.getSeqNr() < (lastPacketReceived + RWS)) {
 			if (packet.getSeqNr() > lastPacketReceived) {
 				receiveBuffer.put(packet.getSeqNr(), packet);
@@ -171,16 +172,16 @@ public class SingleConnection implements Observer {
 		case Packet.Flags.SYN:
 			sendSYNACK(packet.getData());
 			client.startPrivateGUI(packet.getSrc());
-			sendACK(packet);
 			break;
 		case Packet.Flags.FIN:
-			client.stopPrivateGUI(packet.getSrc());
 			sendACK(packet);
+			client.stopPrivateGUI(packet.getSrc());
 			break;
 		case Packet.Flags.FILE_FRG:
 		case Packet.Flags.FILE_LST:
 		case Packet.Flags.FRG:
 		case Packet.Flags.LST:
+			sendACK(packet);
 			HashMap<Integer, Packet> packets = buffer.get(packet.getPacketID());
 			if (packets == null) {
 				packets = new HashMap<Integer, Packet>();
@@ -191,7 +192,6 @@ public class SingleConnection implements Observer {
 			}
 			if (checkBuffer(packet.getPacketID()))
 				flushBuffer(packet.getPacketID());
-			sendACK(packet);
 			break;
 		case Packet.Flags.FILE:
 			sendACK(packet);
