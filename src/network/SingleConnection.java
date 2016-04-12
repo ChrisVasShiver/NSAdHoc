@@ -11,6 +11,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import helper.DistanceVectorEntry;
+import helper.Helper;
 import helper.Packet;
 import helper.PacketFragmenter;
 import main.Client;
@@ -193,14 +194,15 @@ public class SingleConnection implements Observer {
 	}
 
 	private void flushBuffer(Integer ID) {
-		String rawMessage = "";
+		List<Byte> rawMessage = new ArrayList<Byte>();
 		HashMap<Integer, Packet> packetList = buffer.get(ID);
 		for (Packet packet : packetList.values())
-			rawMessage += packet.getData();
+			for(byte b : packet.getData())
+			rawMessage.add(b);
 		Packet header = buffer.get(ID).get(0);
 		String message = header.getSrc().getHostName() + " (" + new Date(header.getTimeStamp()) + "):"
 				+ System.lineSeparator() + " ";
-		byte[] decryptedMessage = hybridEnc.decryptMessage(Packet.dataToByteArray(rawMessage));
+		byte[] decryptedMessage = hybridEnc.decryptMessage(Helper.byteListToArray(rawMessage));
 		message += Packet.dataToString(decryptedMessage);
 		client.messageReceived(header.getSrc(), message);
 	}

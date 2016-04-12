@@ -1,5 +1,7 @@
 package helper;
 
+import java.util.List;
+
 public class Helper {
 
 	public static byte[] integerToByteArray(int i) {
@@ -35,6 +37,13 @@ public class Helper {
 		long result = 0;
 		for(int i = 0; i < bs.length; i++)
 			result = (result << 8) + (bs[i] & 0xff);
+		return result;
+	}
+	
+	public static byte[] byteListToArray(List<Byte> list) {
+		byte[] result = new byte[list.size()];
+		for(int i = 0; i < result.length; i++)
+			result[i] = list.get(i);
 		return result;
 	}
 }
