@@ -185,6 +185,7 @@ public class Client implements Observer {
 		gui.setText(message);
 		
 	}
+	
 	/**
 	 * Is called when the routingTable is updated, will update the user list in GUI
 	 */
