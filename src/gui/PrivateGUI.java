@@ -63,7 +63,6 @@ public class PrivateGUI extends JPanel {
 		flickicon = new FlickIcon(this);
 		this.client = client;
 		this.conn = conn;
-		hasConnection = true;
 		buildGUI();
 	}
 	
@@ -276,27 +275,19 @@ public class PrivateGUI extends JPanel {
 		@Override
 		public void changedUpdate(DocumentEvent e) {
 			disableButtonIfEmpty(e);
-			disaleButtonIfConnectionDown(e);
 		}
 		@Override
 		public void insertUpdate(DocumentEvent e) {
 			disableButtonIfEmpty(e);
-			disaleButtonIfConnectionDown(e);
+			
 		}
 		@Override
 		public void removeUpdate(DocumentEvent e) {
 			disableButtonIfEmpty(e);	
-			disaleButtonIfConnectionDown(e);
 		}
 		
 		public void disableButtonIfEmpty(DocumentEvent e) {
 			send.setEnabled(e.getDocument().getLength() > 0);
-		}
-		
-		public void disaleButtonIfConnectionDown(DocumentEvent e) {
-			if(hasConnection = false) {
-				send.setEnabled(false);
-			}
 		}
 	};
 }
