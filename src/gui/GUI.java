@@ -12,12 +12,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -30,9 +33,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 
 import main.Client;
+import helper.Constants;
 
 import network.MultiConnection;
 import network.SingleConnection;
@@ -43,21 +48,17 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private JFrame frame;
 	private JTextPane texta, message;
 	private JList<InetAddress> users;
 	private JScrollPane scrollUsers;
 	public DefaultListModel<InetAddress> userList = new DefaultListModel<InetAddress>();
 	private JButton send;
 	private JButton attach;
-	public HashMap<InetAddress, PrivateGUI> pGUIs = new HashMap<InetAddress, PrivateGUI>();
+	private HashMap<InetAddress, PrivateGUI> pGUIs = new HashMap<InetAddress, PrivateGUI>();
 	private JFileChooser fc;
 	private Client client;
 	private MultiConnection connections;
-
-	FileFilter docFilter = new FileTypeFilter(".docx", "Microsoft Word Documents");
-	FileFilter pdfFilter = new FileTypeFilter(".pdf", "PDF Documents");
-	FileFilter xlsFilter = new FileTypeFilter(".xlsx", "Microsoft Excel Documents");
-	FileFilter jpgFilter = new FileTypeFilter(".jpg", "JPG Image");
 
 	public GUI(Client client) {
 		this.client = client;
@@ -65,9 +66,9 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		buildGUI();
 	}
 
-	public void buildGUI() {
+	public void buildGUI() {		
 		setLayout(new FlowLayout()); 
-
+		
 		texta = new JTextPane();
 		texta.setEditable(false);
 		texta.setBackground(Color.WHITE);
@@ -115,6 +116,19 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		attach = new JButton("attach");
 		attach.addActionListener(this);
 		add(attach);
+		
+		 frame = new JFrame("Chatbox");
+	     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+	     setBackground(Color.WHITE);
+	     frame.setContentPane(this);
+	     frame.setSize(700, 500);
+	     frame.setVisible(true);
+	     try {
+			frame.setIconImage(ImageIO.read(new File("msn.png")));
+		} catch (IOException e) {
+			//TODO remove stack trace
+			e.printStackTrace();
+		}
 
 	}
 
@@ -122,6 +136,10 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		Calendar cal = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 		return " (" + sdf.format(cal.getTime()) + ") ";
+	}
+	
+	public  HashMap<InetAddress, PrivateGUI> getPGUIs() {
+		return pGUIs;
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -133,11 +151,11 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 			fileChooser.setSize(700, 500);
 			fc = new JFileChooser();
 			fileChooser.add(fc);
-			fileChooser.setVisible(true);
-			fc.addChoosableFileFilter(docFilter);
-			fc.addChoosableFileFilter(pdfFilter);
-			fc.addChoosableFileFilter(xlsFilter);
-			fc.addChoosableFileFilter(jpgFilter);
+			fileChooser.setVisible(false);
+			fc.addChoosableFileFilter(Constants.docFilter);
+			fc.addChoosableFileFilter(Constants.pdfFilter);
+			fc.addChoosableFileFilter(Constants.xlsFilter);
+			fc.addChoosableFileFilter(Constants.jpgFilter);
 
 			int result = fc.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION) {
@@ -175,7 +193,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 			SingleConnection conn = new SingleConnection(client, other, false);
 			if (initiated)
 				conn.sendSYN();
-			PrivateGUI pGUI = new PrivateGUI(client, client.getLocalAddress(), conn, pGUIs);
+			PrivateGUI pGUI = new PrivateGUI(client, client.getLocalAddress(), conn);
 			pGUIs.put(other, pGUI);
 		} else {
 			pGUIs.get(other).requestFocus();
@@ -197,6 +215,10 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	public void setText(String message) {
 		this.texta.setText(texta.getText() + System.lineSeparator() + message);
 	}
+	
+	public void removePGUI(InetAddress other) {
+		pGUIs.remove(other);
+	}
 
 	@Override
 	public void windowActivated(WindowEvent arg0) {
@@ -211,7 +233,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		client.stop();
+		// TODO Auto-generated method stub
 	}
 
 	@Override

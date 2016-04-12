@@ -14,10 +14,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
-
 import gui.GUI;
 import gui.PrivateGUI;
 import helper.DistanceVectorEntry;
@@ -66,9 +62,7 @@ public class Client implements Observer {
 	}
 	
 	public void start() {
-		startThreads();
-		startGUI();
-		
+		startThreads();		
 	}
 	
 	public void stop() {
@@ -99,19 +93,8 @@ public class Client implements Observer {
 		client.start();
 	}
 	
-	public void startGUI() {
-		 JFrame frame = new JFrame("Chatbox");
-	     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-	     gui.setBackground(Color.WHITE);
-	     frame.setContentPane(gui);
-	     frame.setSize(700, 500);
-	     frame.setVisible(true);
-	     try {
-			frame.setIconImage(ImageIO.read(new File("msn.png")));
-		} catch (IOException e) {
-			//TODO remove stack trace
-			e.printStackTrace();
-		}
+	public GUI getGUI() {
+		return gui;
 	}
 	
 	private void startThreads() {
@@ -147,7 +130,7 @@ public class Client implements Observer {
 	}
 			
 	public void stopPrivateGUI(InetAddress address) {
-		PrivateGUI pGUI = gui.pGUIs.get(address);
+		PrivateGUI pGUI = gui.getPGUIs().get(address);
 		if (pGUI != null){
 			String oldText = pGUI.texta.getText();
 			pGUI.texta.setText(oldText + address.getHostName() + " closed the connection" + System.lineSeparator());
@@ -155,9 +138,9 @@ public class Client implements Observer {
 	}
 
 	public void messageReceived(InetAddress source, String message) {
-		for(InetAddress address : gui.pGUIs.keySet()) {
+		for(InetAddress address : gui.getPGUIs().keySet()) {
 			if(source.equals(address)) {
-				gui.pGUIs.get(address).messageReceived(message);
+				gui.getPGUIs().get(address).messageReceived(message);
 			}
 		}
 	}
