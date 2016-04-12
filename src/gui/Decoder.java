@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class Decoder {
-	private static final String DOWNLOAD_PATH = "Download";
+	private static final String DOWNLOAD_PATH = "Downloads";
 	private byte[] filebytes;
 	
 	public Decoder(byte[] bytes){
@@ -16,7 +16,7 @@ public class Decoder {
 	public void decode(String filename) {
 		FileOutputStream fos =null;
 		try {
-			fos = new FileOutputStream(DOWNLOAD_PATH + File.pathSeparator + filename);
+			fos = new FileOutputStream(DOWNLOAD_PATH + File.separator + filename);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -22,6 +22,7 @@ public class FilePacket {
 		byte[] dataLength = new byte[4];
 		System.arraycopy(rawPacket, 4 + fLength, dataLength, 0, 4);
 		int dLength = Helper.byteArrayToInteger(dataLength);
+		this.data = new byte[dLength];
 		System.arraycopy(rawPacket, 4 + fLength + 4, this.data, 0, dLength);
 	}
 	
@@ -32,7 +33,7 @@ public class FilePacket {
 		System.arraycopy(Helper.integerToByteArray(fLength), 0, result, 0, 4);
 		System.arraycopy(filenameBytes, 0, result, 4, fLength);
 		System.arraycopy(Helper.integerToByteArray(data.length),0, result, 4 + fLength, 4);
-		System.arraycopy(data, 4 + fLength + 4, result, 0, data.length);
+		System.arraycopy(data, 0,result, 4 + fLength + 4,  data.length);
 		return result;	
 	}
 	
