@@ -4,9 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import main.Client;
-
+/**
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher 
+ */
 public class PacketFragmenter {
-
+	
+	/*
+	 * This class fragments packets that are too big to send in one packet
+	 * The packages are splitted at the max packet size minus the headersize
+	 * Every package gets flag with the fragment offset, so that the receiver can put packets in the right order
+	 */
 	public static List<Packet> getPackets(Packet header, byte[] data) {
 		List<Packet> packets = new ArrayList<Packet>();
 		int maxDataSize = Client.MAX_PACKET_SIZE - Packet.HEADER_SIZE;

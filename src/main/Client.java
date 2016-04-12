@@ -20,6 +20,7 @@ import threads.DistanceVectorThread;
 import threads.MultiListeningThread;
 import threads.UniListeningThread;
 /**
+ * Class for the client
  * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
  */
 public class Client implements Observer {
@@ -31,15 +32,16 @@ public class Client implements Observer {
 	private Thread ulThread;
 	private DistanceVectorThread dvRunnable;
 	private MultiListeningThread mlRunnable;
-	public UniListeningThread ulRunnable;
+	private UniListeningThread ulRunnable;
 	
 	private GUI gui;
 	
-	public MulticastSocket multiSocket;
-	public InetAddress group;
-	public final int multiPort = 6789;
-	public DatagramSocket uniSocket;
-	public final int uniPort = 7000;
+	private MulticastSocket multiSocket;
+	private DatagramSocket uniSocket;
+	private InetAddress group;
+
+	public static final int multiPort = 6789;
+	public static final int uniPort = 7000;
 	public static final int sendTimeout = 3000;
 	public static final int MAX_PACKET_SIZE = 1024;
 	
@@ -50,28 +52,42 @@ public class Client implements Observer {
 			multiSocket = new MulticastSocket(multiPort);
 			multiSocket.joinGroup(group);
 			uniSocket = new DatagramSocket(uniPort);
-		} catch (IOException e) {
-			//TODO remove stack trace
-			e.printStackTrace();
-		}
+		} catch (IOException e) { System.out.println("Could not start the client, try restarting");}
 		InetAddress localAddress = getLocalAddress();
 		DistanceVectorEntry defaultEntry = new DistanceVectorEntry(localAddress, 0, localAddress);
 		if(localAddress != null)
 			routingTable.put(localAddress, defaultEntry);
 	}
 	
+	/** 
+	 * Starting point of the program
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Client client = new Client();
+		client.start();
+	}
+	
+	/**
+	 * Start the threads and the GUI
+	 */
 	public void start() {
 		startThreads();	
 		this.gui = new GUI(this);
 	}
 	
+	/**
+	 * Stop the client and the threads
+	 */
 	public void stop() {
 		stopThreads();
-		multiSocket.close();
-		uniSocket.close();
-		System.out.println("Client closed");
 	}
 	
+	/**
+	 * Get the local address, will loop over all the interfaces and ignores LinkLocalAddresses and LoopbackAddresses
+	 * Will only return a IPv4 address
+	 * @return The client local address or null if it cannot be found
+	 */
 	public InetAddress getLocalAddress() {
 		try {
 			Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -88,15 +104,10 @@ public class Client implements Observer {
 		} catch(SocketException e) {} 
 		return null;
 	}
-	public static void main(String[] args) {
-		Client client = new Client();
-		client.start();
-	}
 	
-	public GUI getGUI() {
-		return gui;
-	}
-	
+	/**
+	 * Start the threads for this GUI
+	 */
 	private void startThreads() {
 		dvRunnable = new DistanceVectorThread(this);
 		mlRunnable = new MultiListeningThread(this);
@@ -109,26 +120,35 @@ public class Client implements Observer {
 		ulThread.start();
 	}
 	
+	/** 
+	 * Stop the threads for this GUI
+	 */
 	private void stopThreads() {
 		dvRunnable.wait = false;
 		mlRunnable.wait = false;
 		ulRunnable.wait = false;
+		multiSocket.close();
+		uniSocket.close();
 		try {
 			dvThread.join();
 			mlThread.join();
 			ulThread.join();
-		} catch(InterruptedException e) {
-			//TODO remove stack trace
-			e.printStackTrace();
-		}
+		} catch(InterruptedException e) { }
 		
 	}
 
+	/**
+	 * Start a private GUI for the specified address
+	 * @param address
+	 */
 	public void startPrivateGUI(InetAddress address) {
-		System.out.println("Client new window");
 		gui.privateGUI(address, false);
 	}
 			
+	/**
+	 * Stop a private GUI for the specified address
+	 * @param address
+	 */
 	public void stopPrivateGUI(InetAddress address) {
 		PrivateGUI pGUI = gui.getPGUIs().get(address);
 		if (pGUI != null){
@@ -137,6 +157,11 @@ public class Client implements Observer {
 		}
 	}
 
+	/**
+	 * Sets the message in the correct private GUI
+	 * @param source The address of the other node in a private GUI
+	 * @param message The message
+	 */
 	public void messageReceived(InetAddress source, String message) {
 		for(InetAddress address : gui.getPGUIs().keySet()) {
 			if(source.equals(address)) {
@@ -144,7 +169,60 @@ public class Client implements Observer {
 			}
 		}
 	}
+
+	/**
+	 * Sets the group message in the GUI
+	 * @param message
+	 */
+	public void groupMessageReceived(String message) {
+		gui.setText(message);
+		
+	}
 	
+	/**
+	 * Getter for the GUI
+	 * @return the GUI object associated with this client
+	 */
+	public GUI getGUI() {
+		return gui;
+	}
+	
+	/**
+	 * Getter of the UniListeningThread
+	 * @return
+	 */
+	public UniListeningThread getUlRunnable() {
+		return ulRunnable;
+	}
+	
+	/**
+	 * Getter of the DatagramSocket
+	 * @return
+	 */
+	public DatagramSocket getUniSocket() {
+		return uniSocket;
+	}
+	
+	/**
+	 * Getter of the MulticastSocket
+	 * @return
+	 */
+	public MulticastSocket getMultiSocket() {
+		return multiSocket;
+	}
+	
+	/**
+	 * Getter for the group IPv4 address
+	 * @return
+	 */
+	public InetAddress getGroup() {
+		return group;
+	}
+	
+	/**
+	 * Is called when the routingTable is updated, will update the user list in GUI
+	 */
+	@Override
 	public void update(Observable arg0, Object arg1) {
 		if(gui != null) {
 			gui.getUserList().removeAllElements();
@@ -155,8 +233,6 @@ public class Client implements Observer {
 		}
 	}
 
-	public void groupMessageReceived(String message) {
-		gui.setText(message);
-		
-	}
+
+
 }

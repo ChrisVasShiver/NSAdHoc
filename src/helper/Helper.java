@@ -1,7 +1,9 @@
 package helper;
 
 import java.util.List;
-
+/**
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher 
+ */
 public class Helper {
 
 	public static byte[] integerToByteArray(int i) {

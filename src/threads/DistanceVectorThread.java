@@ -20,7 +20,7 @@ public class DistanceVectorThread implements Runnable {
 	public void run() {
 		while(wait) {
 			try {
-				client.multiSocket.send(getDatagramPacket());
+				client.getMultiSocket().send(getDatagramPacket());
 				Thread.sleep(Client.sendTimeout);
 			} catch (InterruptedException | IOException e) { }
 		}
@@ -34,7 +34,7 @@ public class DistanceVectorThread implements Runnable {
 			System.arraycopy(dv.getBytes(), 0, rawPacket, index, DistanceVectorEntry.SIZE);
 			index += DistanceVectorEntry.SIZE;
 		}
-		DatagramPacket packet = new DatagramPacket(rawPacket, rawPacket.length, client.group, client.multiPort);
+		DatagramPacket packet = new DatagramPacket(rawPacket, rawPacket.length, client.getGroup(), client.multiPort);
 		return packet;
 
 	}

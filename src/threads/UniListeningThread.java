@@ -26,10 +26,10 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 			byte[] buffer = new byte[Client.MAX_PACKET_SIZE];
 			DatagramPacket recvPacket = new DatagramPacket(buffer, buffer.length);
 			try {
-				client.uniSocket.receive(recvPacket);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+				client.getUniSocket().receive(recvPacket);
+			} catch (IOException e) {}
+			if(!wait)
+				continue;
 			Packet pkt = null;
 			try {
 				pkt = new Packet(buffer);
@@ -65,7 +65,7 @@ public class UniListeningThread extends Observable implements Runnable, Observer
 				DatagramPacket pkt = new DatagramPacket(packet.getBytes(), packet.getBytes().length,
 						client.routingTable.get(packet.getDest()).nextHop, client.uniPort);
 				try {
-					client.uniSocket.send(pkt);
+					client.getUniSocket().send(pkt);
 				} catch (IOException e) { e.printStackTrace(); }
 			}
 		}
