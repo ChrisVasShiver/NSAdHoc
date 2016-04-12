@@ -34,6 +34,9 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
 
 import main.Client;
 import helper.Constants;
@@ -44,8 +47,9 @@ import network.SingleConnection;
 /**
  * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
  */
-public class GUI extends JPanel implements ActionListener, WindowListener {
+public class GUI extends JPanel{
 	private static final long serialVersionUID = 1L;
+	private GUIController guiController;
 	private JFrame frame;
 	private JTextPane texta, message;
 	private JList<InetAddress> users;
@@ -62,6 +66,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	 * @param client the client
 	 */
 	public GUI(Client client) {
+		guiController = new GUIController(this);
 		this.client = client;
 		this.connections = new MultiConnection(client);
 		buildGUI();
@@ -104,7 +109,8 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		message.getActionMap().put("shiftenter", new shiftEnter());
 		message.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "sendText");
 		message.getActionMap().put("sendText", new sendText());
-
+		Document document = message.getDocument();
+		
 		JScrollPane scrollMessage = new JScrollPane(message);
 		scrollMessage.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollMessage.setPreferredSize(new Dimension(500, 100));
@@ -112,15 +118,16 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		add(scrollMessage);
 
 		send = new JButton("send");
-		send.addActionListener(this);
+		send.addActionListener(guiController);
 		send.setPreferredSize(new Dimension(170, 100));
 		add(send);
 
 		attach = new JButton("attach");
-		attach.addActionListener(this);
+		attach.addActionListener(guiController);
 		add(attach);
 		
 		frame = new JFrame("Chatbox");
+		frame.addWindowListener(guiController);
 	    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	    setBackground(Color.WHITE);
 	    frame.setContentPane(this);
@@ -159,41 +166,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 	/**
 	 * Checks if an action in the GUI has taken place and does an appropriate follow-up
 	 */
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == send && (!message.getText().isEmpty())) {
-			sendMessage(message.getText());
-		}
-		if (e.getSource() == attach) {
-			JFrame fileChooser = new JFrame();
-			fileChooser.setSize(700, 500);
-			fc = new JFileChooser();
-			fileChooser.add(fc);
-			fileChooser.setVisible(false);
-			fc.addChoosableFileFilter(Constants.docFilter);
-			fc.addChoosableFileFilter(Constants.pdfFilter);
-			fc.addChoosableFileFilter(Constants.xlsFilter);
-			fc.addChoosableFileFilter(Constants.jpgFilter);
 
-			int result = fc.showOpenDialog(this);
-			if (result == JFileChooser.APPROVE_OPTION) {
-				System.out.println("File opened");
-				System.out.println(fc.getSelectedFile());
-				fileChooser.dispatchEvent(new WindowEvent(fileChooser, WindowEvent.WINDOW_CLOSING));
-				String typedtext = message.getText();
-				message.setText(typedtext + " " + fc.getSelectedFile().toString());
-				// System.out.println(fc.getSelectedFile().getParent());
-				System.out.println(fc.getSelectedFile().getName() + "is verzonden");
-				if (fc.getSelectedFile().toString().substring(fc.getSelectedFile().toString().lastIndexOf("."),
-						fc.getSelectedFile().toString().length()) == ".jpg") {
-					message.insertIcon(new ImageIcon());
-				}
-				System.out.println(fc.getSelectedFile().toString().substring(
-						fc.getSelectedFile().toString().lastIndexOf("."), fc.getSelectedFile().toString().length()));
-			} else if (result == JFileChooser.CANCEL_OPTION) {
-				System.out.println("Open file was canceled.");
-			}
-		}
-	}
 
 	public MouseListener userSelector = new MouseAdapter() {
 		public void mouseClicked(MouseEvent mouseEvent) {
@@ -237,46 +210,7 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		pGUIs.remove(other);
 	}
 
-	@Override
-	public void windowActivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public void windowClosed(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void windowClosing(WindowEvent arg0) {
-		client.stop();
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowDeiconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowIconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowOpened(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
 	
 	@SuppressWarnings("serial")
 	public class shiftEnter extends AbstractAction{
@@ -291,5 +225,105 @@ public class GUI extends JPanel implements ActionListener, WindowListener {
 		public void actionPerformed(ActionEvent e) {
 				send.doClick();	
 		}
+	}
+	
+	public class GUIController implements DocumentListener, ActionListener, WindowListener{
+		private GUI gui;
+		
+		public GUIController(GUI gui) {
+			this.gui = gui;
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() == send && (!message.getText().isEmpty())) {
+				sendMessage(message.getText());
+			}
+			if (e.getSource() == attach) {
+				JFrame fileChooser = new JFrame();
+				fileChooser.setSize(700, 500);
+				fc = new JFileChooser();
+				fileChooser.add(fc);
+				fileChooser.setVisible(false);
+				fc.addChoosableFileFilter(Constants.docFilter);
+				fc.addChoosableFileFilter(Constants.pdfFilter);
+				fc.addChoosableFileFilter(Constants.xlsFilter);
+				fc.addChoosableFileFilter(Constants.jpgFilter);
+
+				int result = fc.showOpenDialog(this.gui);
+				if (result == JFileChooser.APPROVE_OPTION) {
+					System.out.println("File opened");
+					System.out.println(fc.getSelectedFile());
+					fileChooser.dispatchEvent(new WindowEvent(fileChooser, WindowEvent.WINDOW_CLOSING));
+					String typedtext = message.getText();
+					message.setText(typedtext + " " + fc.getSelectedFile().toString());
+					// System.out.println(fc.getSelectedFile().getParent());
+					System.out.println(fc.getSelectedFile().getName() + "is verzonden");
+					if (fc.getSelectedFile().toString().substring(fc.getSelectedFile().toString().lastIndexOf("."),
+							fc.getSelectedFile().toString().length()) == ".jpg") {
+						message.insertIcon(new ImageIcon());
+					}
+					System.out.println(fc.getSelectedFile().toString().substring(
+							fc.getSelectedFile().toString().lastIndexOf("."), fc.getSelectedFile().toString().length()));
+				} else if (result == JFileChooser.CANCEL_OPTION) {
+					System.out.println("Open file was canceled.");
+				}
+			}
+		}
+		
+		@Override
+		public void windowActivated(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void windowClosed(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void windowClosing(WindowEvent arg0) {
+			client.stop();
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void windowDeactivated(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void windowDeiconified(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void windowIconified(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void windowOpened(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+		
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			
+		}
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			// TODO Auto-generated method stub
+			
+		};
 	};
 }
