@@ -36,14 +36,14 @@ import network.SingleConnection;
 public class PrivateGUI extends JPanel implements ActionListener, WindowListener {
 
 	private static final long serialVersionUID = 6883134327632102722L;
-	public JTextPane texta, message;
+	private JTextPane texta, message;
 	private JButton send, attach;
 	private Client client;
 	private SingleConnection conn;
 	private JFileChooser fc;
 	private JScrollPane scrollPane;
 	private JScrollPane scrollMessage;
-	JFrame frame;
+	private JFrame frame;
 	private FlickIcon flickicon;
 	private boolean getNotification = false;
 	
@@ -59,6 +59,14 @@ public class PrivateGUI extends JPanel implements ActionListener, WindowListener
 		this.client = client;
 		this.conn = conn;
 		buildGUI();
+	}
+	
+	public JTextPane getTextField() {
+		return texta;
+	}
+	
+	public JFrame getFrame() {
+		return frame;
 	}
 	
 	/**
