@@ -31,7 +31,7 @@ public class SingleConnection implements Observer {
 	private int lastPacketID = 1;
 	private int lastPacketReceived = 0;
 	private final int SWS = 10;
-	private final int RWS = 10;
+	private final int RWS = 50;
 	private List<Packet> queue = new ArrayList<Packet>();
 	private HashMap<Integer, HashMap<Integer, Packet>> buffer = new HashMap<Integer, HashMap<Integer, Packet>>();
 	private List<Packet> sentWindow = new ArrayList<Packet>();
