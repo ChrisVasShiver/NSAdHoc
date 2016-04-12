@@ -23,9 +23,7 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -38,7 +36,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import main.Client;
-import helper.Constants;
 
 import network.MultiConnection;
 import network.SingleConnection;
@@ -55,9 +52,7 @@ public class GUI extends JPanel{
 	private JScrollPane scrollUsers;
 	private DefaultListModel<InetAddress> userList = new DefaultListModel<InetAddress>();
 	private JButton send;
-	private JButton attach;
 	private HashMap<InetAddress, PrivateGUI> pGUIs = new HashMap<InetAddress, PrivateGUI>();
-	private JFileChooser fc;
 	private Client client;
 	private MultiConnection connections;
 	/**
@@ -65,7 +60,7 @@ public class GUI extends JPanel{
 	 * @param client the client
 	 */
 	public GUI(Client client) {
-		guiController = new GUIController(this);
+		guiController = new GUIController();
 		this.client = client;
 		this.connections = new MultiConnection(client);
 		buildGUI();
@@ -121,17 +116,14 @@ public class GUI extends JPanel{
 		send.addActionListener(guiController);
 		send.setPreferredSize(new Dimension(170, 100));
 		add(send);
-
-		attach = new JButton("attach");
-		attach.addActionListener(guiController);
-		add(attach);
 		
 		frame = new JFrame("Chatbox");
 		frame.addWindowListener(guiController);
 	    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	    setBackground(Color.WHITE);
 	    frame.setContentPane(this);
-	    frame.setSize(700, 500);
+	    frame.setSize(700, 455);
+	    frame.setResizable(false);
 	    frame.setVisible(true);
 	    try {
 	    	frame.setIconImage(ImageIO.read(new File("msn.png")));
@@ -191,9 +183,9 @@ public class GUI extends JPanel{
 	}
 
 	public void sendMessage(String text) {
-		String oldText = texta.getText();
-//		texta.setText(oldText + client.getLocalAddress().getHostName() + " (" + new Date(System.currentTimeMillis())
-//				+ "):" + System.lineSeparator() + " " + text + System.lineSeparator());
+		//String oldText = texta.getText();
+		//texta.setText(oldText + client.getLocalAddress().getHostName() + " (" + new Date(System.currentTimeMillis())
+		//		+ "):" + System.lineSeparator() + " " + text + System.lineSeparator());
 		message.setText(null);
 		connections.sendMessage(text);
 	}
@@ -224,46 +216,10 @@ public class GUI extends JPanel{
 		}
 	}
 	
-	public class GUIController implements DocumentListener, ActionListener, WindowListener{
-		private GUI gui;
-		
-		public GUIController(GUI gui) {
-			this.gui = gui;
-		}
-		
+	public class GUIController implements DocumentListener, ActionListener, WindowListener{		
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == send && (!message.getText().isEmpty())) {
 				sendMessage(message.getText());
-			}
-			if (e.getSource() == attach) {
-				JFrame fileChooser = new JFrame();
-				fileChooser.setSize(700, 500);
-				fc = new JFileChooser();
-				fileChooser.add(fc);
-				fileChooser.setVisible(false);
-				fc.addChoosableFileFilter(Constants.docFilter);
-				fc.addChoosableFileFilter(Constants.pdfFilter);
-				fc.addChoosableFileFilter(Constants.xlsFilter);
-				fc.addChoosableFileFilter(Constants.jpgFilter);
-
-				int result = fc.showOpenDialog(this.gui);
-				if (result == JFileChooser.APPROVE_OPTION) {
-					System.out.println("File opened");
-					System.out.println(fc.getSelectedFile());
-					fileChooser.dispatchEvent(new WindowEvent(fileChooser, WindowEvent.WINDOW_CLOSING));
-					String typedtext = message.getText();
-					message.setText(typedtext + " " + fc.getSelectedFile().toString());
-					// System.out.println(fc.getSelectedFile().getParent());
-					System.out.println(fc.getSelectedFile().getName() + "is verzonden");
-					if (fc.getSelectedFile().toString().substring(fc.getSelectedFile().toString().lastIndexOf("."),
-							fc.getSelectedFile().toString().length()) == ".jpg") {
-						message.insertIcon(new ImageIcon());
-					}
-					System.out.println(fc.getSelectedFile().toString().substring(
-							fc.getSelectedFile().toString().lastIndexOf("."), fc.getSelectedFile().toString().length()));
-				} else if (result == JFileChooser.CANCEL_OPTION) {
-					System.out.println("Open file was canceled.");
-				}
 			}
 		}
 		
@@ -280,8 +236,7 @@ public class GUI extends JPanel{
 
 		@Override
 		public void windowClosing(WindowEvent arg0) {
-		//	client.stop();
-		// TODO Auto-generated method stub
+			client.stop();
 		}
 
 		@Override
