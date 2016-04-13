@@ -20,10 +20,7 @@ public class FlickIcon extends Thread {
 				Thread.sleep(200);
 				pGUI.getFrame().setIconImage(ImageIO.read(new File("msn.png")));
 				Thread.sleep(200);
-			} catch (IOException | InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} catch (IOException | InterruptedException e) {}
 		}
 
 	}

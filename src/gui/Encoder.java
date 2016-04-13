@@ -23,10 +23,7 @@ public class Encoder {
 		byte[] data = null;
 		try {
 			data = Files.readAllBytes(path);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (IOException e) { System.err.println("Could not read the file"); }
 		return data;
 	}
 }

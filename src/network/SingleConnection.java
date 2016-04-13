@@ -167,7 +167,7 @@ public class SingleConnection implements Observer {
 	private void sendPacket(Packet packet) {
 		DistanceVectorEntry dve = client.routingTable.get(other);
 		if (dve == null) {
-			System.out.println("Address " + other.getHostName() + " is not in your routing table.");
+			System.err.println("Address " + other.getHostName() + " is not in your routing table.");
 			return;
 		}
 		DatagramPacket dpack = new DatagramPacket(packet.getBytes(), packet.getBytes().length, dve.nextHop,

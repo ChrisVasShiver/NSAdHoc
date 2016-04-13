@@ -64,10 +64,7 @@ public class FilePacket {
 		String result = null;
 		try {
 			result = new String(bs, ASCII);
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (UnsupportedEncodingException e) {	}
 		return result;
 	}
 	

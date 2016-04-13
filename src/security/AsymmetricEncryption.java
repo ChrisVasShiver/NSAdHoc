@@ -15,7 +15,7 @@ import javax.crypto.Cipher;
  * sent to someone else who can encrypt a message with it, preferably a secret
  * key, and the private key can be used to decrypt that encrypted message.
  * 
- * @author Bas
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
  *
  */
 public class AsymmetricEncryption {

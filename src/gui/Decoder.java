@@ -25,7 +25,7 @@ public class Decoder {
 			try {
 				downloadDir.mkdir();
 			} catch (SecurityException e) {
-				System.out.println("Could not create the directory " + downloadDir.getPath());
+				System.err.println("Could not create the directory " + downloadDir.getPath());
 			}
 		FileOutputStream fos =null;
 		try {
@@ -35,16 +35,11 @@ public class Decoder {
 		}
 		try {
 			fos.write(filebytes);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException e) { System.err.println("Could not write the file");
 		}
 		try {
 			fos.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (IOException e) { }
 	}
 
 }

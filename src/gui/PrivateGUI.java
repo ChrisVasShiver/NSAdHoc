@@ -131,10 +131,7 @@ public class PrivateGUI extends JPanel {
 		frame.setVisible(true);
 		try {
 			frame.setIconImage(ImageIO.read(new File("msn.png")));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (IOException e) { }
 	}
 
 	public void appendText(String text) {
@@ -170,10 +167,7 @@ public class PrivateGUI extends JPanel {
 		texta.setText(oldText + text + System.lineSeparator());
 		try {
 			a.join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (InterruptedException e) { }
 		texta.setCaretPosition(texta.getDocument().getLength());
 	}
 	
@@ -262,14 +256,6 @@ public class PrivateGUI extends JPanel {
 					Encoder encoder = new Encoder(file.getPath());
 					conn.sendFile(new FilePacket(file.getName(), encoder.encode()));
 					appendText(client.getLocalAddress() + " sent the file: " + file.getName() + System.lineSeparator());
-//					String typedtext = message.getText();
-//					message.setText(typedtext + " " + fc.getSelectedFile().toString());
-//					if (fc.getSelectedFile().toString().substring(fc.getSelectedFile().toString().lastIndexOf("."),
-//							fc.getSelectedFile().toString().length()) == ".jpg") {
-//						message.insertIcon(new ImageIcon());
-//					}
-//					System.out.println(fc.getSelectedFile().toString().substring(
-//							fc.getSelectedFile().toString().lastIndexOf("."), fc.getSelectedFile().toString().length()));
 				}
 			}
 		}

@@ -7,25 +7,13 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 
-// This class is used for encrypting Single Connections. It combines the classes AsymmetricEncryption and SymmetricEncryption.
+/**
+ *  This class is used for encrypting Single Connections. It combines the classes AsymmetricEncryption and SymmetricEncryption.
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
+ *
+ */
 
 public class HybridEncryption {
-
-	/**
-	 * for testing the code
-	 */
-
-	public static void main(String[] args) throws Exception {
-		// HybridEncryption hb = new HybridEncryption();
-		// byte[] publicKey = hb.getPublicKey();
-		// byte[] privateKey = hb.getPrivateKey();
-		// byte[] key = hb.generateEncryptedKey(publicKey);
-		// hb.asEn.decrypt(key, privateKey);
-		// hb.decryptAndStoreKey(key);
-		// byte[] m = hb.encryptMessage(Base64.decodeBase64(test));
-		// byte[] message = hb.decryptMessage(m);
-		// System.out.println(Base64.encodeBase64String(message));
-	}
 
 	/**
 	 * The secret key that both ends of the connection should have at some point

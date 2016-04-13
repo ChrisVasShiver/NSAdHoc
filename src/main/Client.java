@@ -48,7 +48,7 @@ public class Client implements Observer {
 			multiSocket = new MulticastSocket(Constants.MULTI_SOCKET_PORT);
 			multiSocket.joinGroup(group);
 			uniSocket = new DatagramSocket(Constants.UNI_SOCKET_PORT);
-		} catch (IOException e) { System.out.println("Could not start the client, try restarting");}
+		} catch (IOException e) { System.err.println("Could not start the client, try restarting");}
 		InetAddress localAddress = getLocalAddress();
 		DistanceVectorEntry defaultEntry = new DistanceVectorEntry(localAddress, 0, localAddress);
 		if(localAddress != null)

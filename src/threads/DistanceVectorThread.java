@@ -8,6 +8,9 @@ import helper.Constants;
 import helper.DistanceVectorEntry;
 import main.Client;
 
+/**
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
+ */
 public class DistanceVectorThread implements Runnable {
 
 	public volatile boolean wait = true;
@@ -17,6 +20,9 @@ public class DistanceVectorThread implements Runnable {
 		this.client = client;
 	}
 
+	/**
+	 * Send the distance vector and wait PACKET_TIMEOUT
+	 */
 	@Override
 	public void run() {
 		while(wait) {
@@ -27,6 +33,10 @@ public class DistanceVectorThread implements Runnable {
 		}
 	}
 	
+	/**
+	 * Make the DatagramPacket with the routing table
+	 * @return
+	 */
 	private synchronized DatagramPacket getDatagramPacket() {
 		byte[] rawPacket = new byte[client.routingTable.size() * DistanceVectorEntry.SIZE];
 		int index = 0;

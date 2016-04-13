@@ -10,6 +10,9 @@ import helper.Constants;
 import helper.DistanceVectorEntry;
 import main.Client;
 
+/**
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
+ */
 public class MultiListeningThread implements Runnable {
 
 	public volatile boolean wait = true;
@@ -19,6 +22,9 @@ public class MultiListeningThread implements Runnable {
 		this.client = client;
 	}
 
+	/**
+	 * Receive packets on the multicast socket
+	 */
 	@Override
 	public void run() {
 		while(wait) {
@@ -41,6 +47,11 @@ public class MultiListeningThread implements Runnable {
 		}
 	}
 	
+	/**
+	 * Handle the received distance vector
+	 * @param packet
+	 * @param sender
+	 */
 	public synchronized void handleDistanceVectorPacket(byte[] packet, InetAddress sender) {
 		HashMap<InetAddress, DistanceVectorEntry> recvDistanceVector = new HashMap<InetAddress, DistanceVectorEntry>();
 		for(int i = 0; i < packet.length; i += DistanceVectorEntry.SIZE) {
@@ -55,6 +66,11 @@ public class MultiListeningThread implements Runnable {
 		updateEntries(recvDistanceVector, sender);
 	}
 
+	/**
+	 * Update the distance vector according to the received distance vector
+	 * @param distanceVector
+	 * @param sender
+	 */
 	private void updateRoutingTable(HashMap<InetAddress, DistanceVectorEntry> distanceVector, InetAddress sender) {
 		for(InetAddress address : distanceVector.keySet()) {
 			DistanceVectorEntry entry = distanceVector.get(address);
@@ -69,6 +85,11 @@ public class MultiListeningThread implements Runnable {
 		}
 	}
 	
+	/**
+	 * Remove all the entries that are not being advertised by the node which previously advertised the route
+	 * @param distanceVector
+	 * @param sender
+	 */
 	private void updateEntries(HashMap<InetAddress, DistanceVectorEntry> distanceVector, InetAddress sender) {
 		for(InetAddress address : client.routingTable.keySet()) {
 			DistanceVectorEntry storedEntry = client.routingTable.get(address);
@@ -80,12 +101,18 @@ public class MultiListeningThread implements Runnable {
 		}
 	}
 	
+	/**
+	 * Print the routing table (for debugging purposes)
+	 */
 	public synchronized void printRoutingTable() {
 		System.out.println("Routing Table: ");
 		for(InetAddress address : client.routingTable.keySet()) 
 			System.out.println(client.routingTable.get(address).toString());
 	}
 	
+	/**
+	 * Check whether a timeout has elapsed so it is assumed that this node is unreachable
+	 */
 	private void checkTimeoutElapsed() {
 		for(InetAddress address : client.neighbourTimeout.keySet()) {
 			long now = System.currentTimeMillis();
@@ -95,6 +122,10 @@ public class MultiListeningThread implements Runnable {
 		}
 	}
 	
+	/**
+	 * Remove all the entries that are being advertised by a node which has become unreachable
+	 * @param node
+	 */
 	private void removeEntries(InetAddress node) {
 		for(InetAddress address : client.routingTable.keySet())
 			if(client.routingTable.get(address).nextHop.equals(node)) 

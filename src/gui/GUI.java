@@ -182,9 +182,6 @@ public class GUI extends JPanel{
 	}
 
 	public void sendMessage(String text) {
-		//String oldText = texta.getText();
-		//texta.setText(oldText + client.getLocalAddress().getHostName() + " (" + new Date(System.currentTimeMillis())
-		//		+ "):" + System.lineSeparator() + " " + text + System.lineSeparator());
 		message.setText(null);
 		connections.sendMessage(text);
 	}
@@ -224,13 +221,10 @@ public class GUI extends JPanel{
 		
 		@Override
 		public void windowActivated(WindowEvent arg0) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void windowClosed(WindowEvent arg0) {
-			// TODO Auto-generated method stub
 		}
 
 		@Override
@@ -240,26 +234,20 @@ public class GUI extends JPanel{
 
 		@Override
 		public void windowDeactivated(WindowEvent arg0) {
-			// TODO Auto-generated method stub
 
 		}
 
 		@Override
 		public void windowDeiconified(WindowEvent arg0) {
-			// TODO Auto-generated method stub
 
 		}
 
 		@Override
 		public void windowIconified(WindowEvent arg0) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void windowOpened(WindowEvent arg0) {
-			// TODO Auto-generated method stub
-
 		}
 		
 		@Override

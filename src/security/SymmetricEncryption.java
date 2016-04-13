@@ -14,7 +14,7 @@ import javax.crypto.NoSuchPaddingException;
  * This class is used to encrypt and decrypt data with a secret AES-based key.
  * The secret key can be sent, preferably via an Asymmetric Encryption method.
  * 
- * @author Bas
+ * @author M. van Helden, B. van 't Spijker, T. Sterrenburg, C. Visscher
  *
  */
 public class SymmetricEncryption {
